@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kühlschrank-Koch</title>
+
+  <style>
+    /* Gesamtlayout und Hintergrund */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      background-color: #f4f4f4;
+      color: #333;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Seitenleisten und Hauptbereich */
+    .sidebar, .rightbar {
+      background-color: #2ECC71;
+      width: 15%;
+      padding: 20px;
+      box-sizing: border-box;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .main {
+      flex: 1;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-sizing: border-box;
+    }
+
+    /* Favoritenliste */
+    .favorites {
+      list-style: none;
+      padding: 0;
+    }
+
+    .favorites li {
+      background: #fff;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #333;
+    }
+
+    /* Haupttitel */
+    .title {
+      font-size: 36px;
+      font-weight: bold;
+      color: #2ECC71;
+      margin-bottom: 20px;
+    }
+
+    /* Zutaten Auswahl */
+    .ingredients-container {
+      background-color: #e0e0e0;
+      padding: 20px;
+      border-radius: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      max-width: 800px;
+      margin-top: 20px;
+    }
+
+    .ingredient {
+      padding: 10px 20px;
+      border-radius: 5px;
+      background-color: #fff;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      user-select: none;
+    }
+
+    .ingredient.selected {
+      background-color: #2ECC71;
+      color: white;
+    }
+
+    /* Suchleiste */
+    .search-bar {
+      width: 100%;
+      max-width: 800px;
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+      padding-right: 40px;
+      font-size: 16px;
+    }
+
+    .search-icon {
+      position: absolute;
+      right: 10px;
+      color: #888;
+    }
+
+    /* Kontaktbereich */
+    .contact {
+      font-size: 3vh;
+      color: white;
+    }
+
+    /* Rechte Seitenleiste mit Account */
+    .topright {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 20%;
+    }
+
+    .account-icon {
+      font-size: 40px; /* Größeres Icon für bessere Sichtbarkeit */
+      margin-bottom: 10px; /* Abstand zwischen Icon und Schriftzug */
+    }
+
+    .account {
+      font-size: 18px; /* Schriftgröße anpassen */
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Linke Seitenleiste mit Favoriten -->
+  <div class="sidebar">
+    <div>
+      <h3>Favoriten:</h3>
+      <ul class="favorites">
+        <li>Pizza Margherita <span>⭐</span></li>
+        <li>Flammkuchen <span>⭐</span></li>
+        <li>Pizza Margherita <span>⭐</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Hauptbereich -->
+  <div class="main">
+    <h1 class="title">Kühlschrank-Koch</h1>
+
+    <!-- Suchleiste -->
+    <div class="search-bar" ondrop="drop(event)" ondragover="allowDrop(event)">
+      <input type="text" class="search-input" id="searchInput" placeholder="Choose your ingredients" oninput="manualInput()" />
+      <span class="search-icon">🔍</span>
+    </div>
+
+    <!-- Zutaten-Auswahl -->
+    <div class="ingredients-container">
+      <div class="ingredient" draggable="true" ondragstart="drag(event)">Tomatoes</div>
+      <div class="ingredient" draggable="true" ondragstart="drag(event)">Eggs</div>
+      <div class="ingredient" draggable="true" ondragstart="drag(event)">Milk</div>
+      <div class="ingredient" draggable="true" ondragstart="drag(event)">Beef</div>
+      <div class="ingredient" draggable="true" ondragstart="drag(event)">Cheese</div>
+      <div class="ingredient" draggable="true" ondragstart="drag(event)">Flour</div>
+      <div class="ingredient" draggable="true" ondragstart="drag(event)">Tuna</div>
+      <div class="ingredient" draggable="true" ondragstart="drag(event)">Creme Fresh</div>
+      <div class="ingredient" draggable="true" ondragstart="drag(event)">Chicken</div>
+      <div class="ingredient" draggable="true" ondragstart="drag(event)">Carrots</div>
+      <div class="ingredient" draggable="true" ondragstart="drag(event)">Potatoes</div>
+      <div class="ingredient" draggable="true" ondragstart="drag(event)">Olive Oil</div>
+    </div>
+  </div>
+
+  <!-- Rechte Seitenleiste mit Account und Kontakt -->
+  <div class="rightbar">
+    <div class="topright" onclick="window.location.href='account.html';">
+      <div class="account-icon">👤</div>
+      <div class="account">Account</div>
+    </div>
+    <div class="contact">
+      Kontakt: <br>
+      Simon Rapp<br>
+      Gideon Rüscher
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    // Liste der ausgewählten Zutaten
+    let selectedIngredients = [];
+
+    // Drag and Drop Funktionen
+    function drag(event) {
+      event.dataTransfer.setData("text", event.target.textContent);
+    }
+
+    function allowDrop(event) {
+      event.preventDefault();
+    }
+
+    function drop(event) {
+      event.preventDefault();
+      const ingredient = event.dataTransfer.getData("text");
+      addIngredient(ingredient);
+    }
+
+    // Funktion zum Hinzufügen einer Zutat (via Drag-and-Drop oder manuelle Eingabe)
+    function addIngredient(ingredient) {
+      if (!selectedIngredients.includes(ingredient)) {
+        selectedIngredients.push(ingredient);
+        updateSearchInput();
+        updateIngredientDisplay(ingredient);
+      }
+    }
+
+    // Manuelle Eingabe erkennen und Zutaten hinzufügen
+    function manualInput() {
+      const input = document.getElementById('searchInput').value;
+      const ingredients = input.split(',').map(i => i.trim());
+
+      selectedIngredients = []; // zurücksetzen und neu aus dem Input übernehmen
+
+      ingredients.forEach(ingredient => {
+        if (ingredient && !selectedIngredients.includes(ingredient)) {
+          selectedIngredients.push(ingredient);
+        }
+      });
+
+      updateSearchInput();
+      updateIngredientDisplays();
+    }
+
+    // Anzeige im Suchfeld aktualisieren
+    function updateSearchInput() {
+      const searchInput = document.getElementById('searchInput');
+      searchInput.value = selectedIngredients.join(', ');
+    }
+
+    // Zutaten optisch markieren
+    function updateIngredientDisplay(ingredient) {
+      const ingredientElements = document.querySelectorAll('.ingredient');
+      ingredientElements.forEach((element) => {
+        if (element.textContent === ingredient) {
+          element.classList.add('selected');
+        }
+      });
+    }
+
+    // Alle Zutaten-Displays aktualisieren, basierend auf der `selectedIngredients`-Liste
+    function updateIngredientDisplays() {
+      const ingredientElements = document.querySelectorAll('.ingredient');
+      ingredientElements.forEach(element => {
+        if (selectedIngredients.includes(element.textContent)) {
+          element.classList.add('selected');
+        } else {
+          element.classList.remove('selected');
+        }
+      });
+    }
+  </script>
+</body>
+</html>
