@@ -169,12 +169,13 @@
     </div>
 
     <!-- Zutaten-Auswahl -->
+    <form action="recipe-overview.php" method="GET">
     <div class="ingredients-container">
-      <div class="ingredient" draggable="true" ondragstart="drag(event)">Tomatoes</div>
-      <div class="ingredient" draggable="true" ondragstart="drag(event)">Eggs</div>
-      <div class="ingredient" draggable="true" ondragstart="drag(event)">Milk</div>
-      <div class="ingredient" draggable="true" ondragstart="drag(event)">Beef</div>
-      <div class="ingredient" draggable="true" ondragstart="drag(event)">Cheese</div>
+      <div class="ingredient" name="ingredient1" draggable="true" ondragstart="drag(event)">Tomatoes</div>
+      <div class="ingredient" name="ingredient2" draggable="true" ondragstart="drag(event)">Eggs</div>
+      <div class="ingredient" name="ingredient3" draggable="true" ondragstart="drag(event)">Milk</div>
+      <div class="ingredient" name="ingredient4" draggable="true" ondragstart="drag(event)">Beef</div>
+      <div class="ingredient" name="ingredient5" draggable="true" ondragstart="drag(event)">Cheese</div>
       <div class="ingredient" draggable="true" ondragstart="drag(event)">Flour</div>
       <div class="ingredient" draggable="true" ondragstart="drag(event)">Tuna</div>
       <div class="ingredient" draggable="true" ondragstart="drag(event)">Creme Fresh</div>
@@ -183,6 +184,7 @@
       <div class="ingredient" draggable="true" ondragstart="drag(event)">Potatoes</div>
       <div class="ingredient" draggable="true" ondragstart="drag(event)">Olive Oil</div>
     </div>
+  </form>
   </div>
 
   <!-- Rechte Seitenleiste mit Account und Kontakt -->
@@ -271,6 +273,17 @@
         }
       });
     }
+
+    function fetchRecipes() {
+    const ingredients = selectedIngredients.join(',');
+    fetch(`/recipes?ingredients=${ingredients}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log(data); // Hier könnt ihr die Rezepte in der Webseite anzeigen
+        })
+        .catch(error => console.error('Fehler:', error));
+}
+
   </script>
 </body>
 </html>
