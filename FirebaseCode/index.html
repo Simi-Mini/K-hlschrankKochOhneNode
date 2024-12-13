@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KühlschrankKoch</title>
+    <link rel="stylesheet" href="style.css">
+
+
+
+    <!-- Firebase UMD-Version -->
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+
+    <!-- Eigener Script -->
+    <script defer src="script.js"></script>
+    <script src="env.js"></script>
+</head>
+<body>
+    <div class="überschrift">
+    <h1>Kühlschrank Koch</h1>
+    </div>
+    <div class="zutaten">
+    <form id="ingredients-form">
+        <h2>Wähle deine Zutaten:</h2>
+        <div id="ingredient-buttons">
+            <button type="button" data-value="Salat">Salat</button>
+            <button type="button" data-value="Tomaten">Tomaten</button>
+            <button type="button" data-value="Gurken">Gurken</button>
+            <button type="button" data-value="Pasta">Pasta</button>
+            <button type="button" data-value="Speck">Speck</button>
+        </div>
+        <br>
+        <button type="submit">Rezepte suchen</button>
+    </form>
+    
+    
+    <div id="recipes">
+        <h2>Gefundene Rezepte:</h2>
+    </div>
+</div>
+</body>
+</html>

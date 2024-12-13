@@ -1,0 +1,71 @@
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+form {
+    margin: 20px;
+    padding: 10px;
+    background: rgb(148, 148, 148);
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+button {
+    background: #007BFF;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+button:hover {
+    background: #0056b3;
+}
+
+#recipes {
+    margin: auto;
+    padding: 10px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    width: 65%;
+}
+
+#ingredient-buttons button {
+    margin: 5px;
+    background: lightgrey;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+#ingredient-buttons button.active {
+    background: #078823;
+}
+
+.überschrift{
+    text-align: center;
+    color: #078823;
+}
+
+#ingredients-form {
+    margin: auto;
+    width: 65%;
+}
+
+.zutaten {
+    text-align: center;
+}
