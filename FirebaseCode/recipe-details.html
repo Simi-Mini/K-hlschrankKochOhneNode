@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rezept-Details</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+    <script defer src="recipe-details.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Linke Seitenleiste -->
+        <div class="left-sidebar">
+            <h3>Favoriten</h3>
+            <div id="favourites-list">
+                <!-- Dynamische Favoriten-Liste -->
+            </div>
+        </div>
+
+        <!-- Hauptinhalt -->
+        <div class="main-content">
+            <button id="back-to-home" class="back-button">Zurück zur Startseite</button>
+
+            <div id="recipe-details">
+                <h1 id="recipe-name"></h1>
+                <img id="recipe-image" src="" alt="Rezept Bild" class="recipe-image">
+                
+                <h3>Zutaten</h3>
+                <table id="recipe-amounts" class="amounts-table">
+                    <!-- Dynamische Tabelle der Zutaten -->
+                </table>
+
+                <p id="recipe-level"></p>
+                <p id="recipe-time"></p>
+                
+                <h3>Zubereitung</h3>
+                <p id="recipe-description"></p>
+            </div>
+        </div>
+
+        <!-- Rechte Seitenleiste -->
+        <div class="right-sidebar">
+            <a href="login.html">Account</a>
+            <p>Account-Details anzeigen...</p>
+        </div>
+    </div>
+</body>
+</html>

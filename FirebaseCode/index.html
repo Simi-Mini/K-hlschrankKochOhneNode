@@ -6,8 +6,6 @@
     <title>KühlschrankKoch</title>
     <link rel="stylesheet" href="style.css">
 
-
-
     <!-- Firebase UMD-Version -->
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
@@ -17,27 +15,54 @@
     <script src="env.js"></script>
 </head>
 <body>
-    <div class="überschrift">
-    <h1>Kühlschrank Koch</h1>
+
+    <!-- Container für das Layout -->
+    <div class="container">
+        <!-- Linke Spalte -->
+        <aside class="left-sidebar">
+            <h3>Favoriten</h3>
+            <p>Hier können später Favoriten angezeigt werden.</p>
+        </aside>
+
+        <!-- Hauptinhalt -->
+        <main class="main-content">
+            <div class="überschrift">
+                <h1>Kühlschrank Koch</h1>
+            </div>
+
+            <div class="zutaten">
+                <form id="ingredients-form">
+                    <div id="ingredients-section">
+                        <h2>Wähle deine Zutaten:</h2>
+                        <div id="ingredient-buttons" class="ingredient-buttons-container">
+                            <!-- Dynamische Buttons werden hier eingefügt -->
+                        </div>
+                    </div>
+                    
+                    <h2>Wähle deine Zutaten:</h2>
+                    <div id="ingredient-buttons">
+                        <button type="button" data-value="Salat">Salat</button>
+                        <button type="button" data-value="Tomaten">Tomaten</button>
+                        <button type="button" data-value="Gurken">Gurken</button>
+                        <button type="button" data-value="Pasta">Pasta</button>
+                        <button type="button" data-value="Speck">Speck</button>
+                    </div>
+                    <br>
+                    <button type="submit">Rezepte suchen</button>
+                </form>
+
+                <div id="recipes">
+                    <h2>Gefundene Rezepte:</h2>
+                </div>
+            </div>
+        </main>
+
+        <!-- Rechte Spalte -->
+        <aside class="right-sidebar">
+            <a href="login.html">Account</a>
+
+            <p>Hier können später Account-Informationen angezeigt werden.</p>
+        </aside>
     </div>
-    <div class="zutaten">
-    <form id="ingredients-form">
-        <h2>Wähle deine Zutaten:</h2>
-        <div id="ingredient-buttons">
-            <button type="button" data-value="Salat">Salat</button>
-            <button type="button" data-value="Tomaten">Tomaten</button>
-            <button type="button" data-value="Gurken">Gurken</button>
-            <button type="button" data-value="Pasta">Pasta</button>
-            <button type="button" data-value="Speck">Speck</button>
-        </div>
-        <br>
-        <button type="submit">Rezepte suchen</button>
-    </form>
-    
-    
-    <div id="recipes">
-        <h2>Gefundene Rezepte:</h2>
-    </div>
-</div>
 </body>
 </html>
