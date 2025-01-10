@@ -88,11 +88,13 @@ form {
     padding: 10px 15px;
     cursor: pointer;
     border-radius: 5px;
-    color: white;
+    color: black;
 }
 
 #ingredient-buttons button.active {
     background: #078823;
+    color: white ;
+    border: 1px solid #078823;
 }
 
 #ingredient-buttons button:hover {
