@@ -1,0 +1,9 @@
+// Firebase-Konfiguration (ersetzt dies mit euren Daten aus der Firebase-Konsole)
+const firebaseConfig = {
+    apiKey: "AIzaSyA61kcGoFKvMUz88mJhKYbB8FBbylGLT6g",
+    authDomain: "kuehlschrank-koch.firebaseapp.com",
+    projectId: "kuehlschrank-koch",
+    storageBucket: "kuehlschrank-koch.firebasestorage.app",
+    messagingSenderId: "107624432024",
+    appId: "1:107624432024:web:bc03288da99fa6d2092bed"
+};

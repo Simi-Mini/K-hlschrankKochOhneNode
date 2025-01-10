@@ -1,0 +1,418 @@
+/* Allgemeine Stile */
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+/* Hauptcontainer für das Layout */
+.container {
+    display: grid;
+    grid-template-columns: 1fr 3fr 1fr; /* Linke Spalte, Hauptinhalt, Rechte Spalte */
+    gap: 20px;
+    padding: 20px;
+    height: 100vh;
+    box-sizing: border-box;
+}
+
+/* Linke Spalte */
+.left-sidebar {
+    background-color: #2e7d32;
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Rechte Spalte */
+.right-sidebar {
+    background-color: #2e7d32;
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Hauptinhalt */
+.main-content {
+    background: #f4f4f4;
+    padding: 15px;
+    border-radius: 10px;
+    overflow-y: auto;
+}
+
+/* Überschrift */
+.überschrift h1 {
+    text-align: center;
+    color: #333;
+}
+
+/* Formulare */
+form {
+    margin: 20px;
+    padding: 10px;
+    background: rgb(148, 148, 148);
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+#ingredients-form {
+    margin: auto;
+    width: 65%;
+}
+
+/* Zutatenauswahl */
+.zutaten {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#ingredient-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+#ingredient-buttons button {
+    background: lightgrey;
+    border: 1px solid #ccc;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+    color: white;
+}
+
+#ingredient-buttons button.active {
+    background: #078823;
+}
+
+#ingredient-buttons button:hover {
+    background: #2e7d32;
+    color: white;
+}
+
+/* Allgemeine Buttons */
+button {
+    background: #007BFF;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+button:hover {
+    background: #0056b3;
+}
+
+/* Rezepte-Bereich */
+#recipes {
+    max-width: 1200px; /* Container für 3 Karten */
+    margin: 20px auto;
+    padding: 20px;
+}
+
+/* Überschrift für Rezepte */
+#recipes h2 {
+    text-align: center;
+    color: #333;
+}
+
+/* Grid-Layout für Rezeptkarten */
+.recipe-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 Karten nebeneinander */
+    gap: 20px; /* Abstand zwischen Karten */
+}
+
+/* Rezeptkarte */
+.recipe-card {
+    display: flex;
+    flex-direction: column;
+    background: #f4f4f4;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    text-align: left;
+    max-width: 300px;
+    margin: 10px;
+    font-family: Arial, sans-serif;
+    height: 400px; /* Einheitliche Höhe */
+}
+
+/* Rezeptkarten-Bild */
+.recipe-card img,
+.recipe-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+/* Inhalt der Rezeptkarte */
+.recipe-content {
+    padding: 15px;
+}
+
+.recipe-title {
+    font-size: 1.2em;
+    margin: 10px 0;
+    color: #333;
+}
+
+.recipe-ingredients,
+.recipe-description {
+    margin: 5px 0;
+    font-size: 0.9em;
+    color: #666;
+}
+
+.recipe-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    font-size: 0.9em;
+    color: #333;
+}
+
+.recipe-level,
+.recipe-time {
+    font-weight: bold;
+}
+
+/* Hover-Effekt für Rezeptkarten */
+.recipe-card:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
+}
+
+/* Container für vollständige und unvollständige Rezepte */
+.recipe-section {
+    margin-bottom: 30px;
+}
+
+.recipe-section h2 {
+    color: #333;
+    margin-bottom: 15px;
+}
+
+/* Responsives Verhalten */
+@media screen and (max-width: 1024px) {
+    .recipe-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2 Karten nebeneinander */
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .recipe-grid {
+        grid-template-columns: 1fr; /* 1 Karte pro Reihe */
+    }
+}
+
+.account input {
+    margin: 5px 0;
+    padding: 10px;
+    width: 90%;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.account button {
+    margin: 5px 0;
+    padding: 10px;
+    width: 100%;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.account button:hover {
+    background-color: #0056b3;
+}
+
+#user-info {
+    text-align: center;
+}
+#username {
+    margin-bottom: 15px;
+    padding: 10px;
+    width: 100%;
+    border: none;
+    border-radius: 5px;
+    background-color: #666;
+    color: white;
+    font-size: 1rem;
+}
+
+/* Rezept-Details Styling */
+#recipe-details {
+    text-align: center;
+    padding: 20px;
+}
+
+#recipe-details img {
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+    border-radius: 10px;
+    margin: 20px 0;
+}
+
+.recipe-meta {
+    margin: 20px 0;
+    font-size: 1.2rem;
+}
+
+.recipe-meta p {
+    margin: 5px 0;
+}
+
+#recipe-description {
+    text-align: justify;
+    font-size: 1rem;
+    margin-top: 20px;
+}
+.amounts-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 1em;
+    font-family: Arial, sans-serif;
+}
+
+.amounts-table th,
+.amounts-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+.amounts-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+    color: #333;
+}
+
+.amounts-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.amounts-table tr:hover {
+    background-color: #f1f1f1;
+}
+
+.recipe-image {
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+    border-radius: 10px;
+    margin: 20px 0;
+}
+
+#recipe-level, #recipe-time {
+    font-size: 1.2em;
+    margin-top: 10px;
+    color: #666;
+}
+.back-button {
+    display: block;
+    margin: 20px auto;
+    padding: 10px 20px;
+    font-size: 16px;
+    color: white;
+    background-color: #2e7d32;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+.back-button:hover {
+    background-color: #1b5e20;
+}
+
+.ingredient-buttons-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.ingredient-button {
+    padding: 10px 15px;
+    background-color: #f4f4f4;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.ingredient-button.active {
+    background-color: #2e7d32;
+    color: white;
+}
+
+.ingredient-button:hover {
+    background-color: #1b5e20;
+    color: white;
+}
+
+.more-ingredients-button {
+    padding: 10px 15px;
+    background-color: #007BFF;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.more-ingredients-button:hover {
+    background-color: #0056b3;
+}
+
+
+#ingredient-buttons {
+    max-height: 150px; /* Begrenze die Höhe der Box */
+    overflow: hidden; /* Verstecke den Überlauf */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    transition: max-height 0.3s ease;
+}
+
+#ingredient-buttons.expanded {
+    max-height: none; /* Hebt die Begrenzung der Höhe auf */
+}
+
+#toggle-more-ingredients {
+    margin: 10px auto;
+    display: block;
+    padding: 10px 15px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#toggle-more-ingredients:hover {
+    background-color: #0056b3;
+}
