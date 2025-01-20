@@ -1,85 +1,120 @@
-/* Allgemeines Layout */
+/* General Layout */
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
-    color: white;
-    background-color: #2e7d32;
-}
-
-/* Hauptcontainer */
-.login-container {
-    display: flex;
-    height: 100vh;
-}
-
-/* Sidebar für den Link zur Startseite */
-.sidebar {
-    width: 20%;
-    background-color: white;
+    font-family: 'Poppins', Arial, sans-serif;
+    color: #333;
+    background: #f9f9f9; /* Light gray for subtle background contrast */
     display: flex;
     align-items: center;
     justify-content: center;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+/* Main Container */
+.login-container {
+    display: flex;
+    width: 90%;
+    max-width: 1000px;
+    height: 80vh;
+    border-radius: 20px; /* Smoother rounded edges */
+    overflow: hidden;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1); /* Enhanced shadow for depth */
+    background: #ffffff; /* White container background */
+}
+
+/* Sidebar for Startseite */
+.sidebar {
+    width: 35%;
+    background: linear-gradient(135deg, #2b8c46, #3fae57); /* Subtle gradient for the sidebar */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 20px;
+    border-radius: 20px 0 0 20px; /* Ensure the left side of the container matches */
 }
 
 .sidebar a {
     text-decoration: none;
-    color: #2e7d32;
-    font-size: 1.2rem;
+    color: #ffffff; /* White text on green */
+    font-size: 2.2rem; /* Larger font size */
     font-weight: bold;
+    text-shadow: 0px 3px 6px rgba(0, 0, 0, 0.3); /* Subtle shadow for text */
+    transition: transform 0.3s ease, color 0.3s ease;
+    text-align: center;
 }
 
-/* Hauptinhalt */
+.sidebar a:hover {
+    color: #d8efd6; /* Light green on hover */
+    transform: scale(1.1); /* Slight zoom effect */
+}
+
+/* Main Content */
 .main-content {
     flex: 1;
-    padding: 20px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background-color: #2e7d32;
+    text-align: center;
+    padding: 30px;
+    background: #e3f3e6; /* Soft, light green for the main content */
+    border-radius: 0 20px 20px 0; /* Ensure the right side of the container matches */
 }
 
 .main-content h1 {
-    font-size: 2rem;
+    font-size: 2.4rem;
     margin-bottom: 10px;
-    text-align: center;
+    color: #2b8c46; /* Green text for branding consistency */
+    font-weight: bold;
 }
 
 .main-content h2 {
-    font-size: 1.5rem;
-    margin-bottom: 20px;
-    text-align: center;
+    font-size: 1.8rem;
+    margin-bottom: 25px;
+    color: #3fae57; /* Lighter green for differentiation */
 }
 
+/* Form Styling */
 form {
-    width: 300px;
+    width: 350px;
+    padding: 25px;
+    background: #ffffff; /* White form background */
+    border-radius: 15px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1); /* Clean shadow for depth */
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
 form label {
-    margin-bottom: 5px;
+    margin-bottom: 8px;
     font-size: 1rem;
+    color: #333;
     width: 100%;
     text-align: left;
 }
 
 form input {
     margin-bottom: 15px;
-    padding: 10px;
+    padding: 12px;
     width: 100%;
-    border: none;
-    border-radius: 5px;
-    background-color: #666;
-    color: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    color: #333;
     font-size: 1rem;
+    transition: box-shadow 0.3s ease, transform 0.2s ease;
 }
 
 form input:focus {
-    outline: 2px solid #fff;
+    outline: none;
+    box-shadow: 0px 0px 10px rgba(67, 160, 71, 0.5); /* Highlighted green shadow */
+    transform: scale(1.02); /* Slight zoom for focus */
 }
 
+/* Buttons */
 .buttons {
     display: flex;
     justify-content: space-between;
@@ -87,45 +122,54 @@ form input:focus {
 }
 
 .buttons button {
-    padding: 10px 15px;
+    padding: 12px;
     width: 48%;
-    background-color: #555;
+    background: linear-gradient(135deg, #43a047, #66bb6a); /* Gradient green for buttons */
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     color: white;
     font-size: 1rem;
+    font-weight: bold;
     cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
 }
 
 .buttons button:hover {
-    background-color: #444;
+    background: linear-gradient(135deg, #388e3c, #43a047); /* Slightly darker gradient on hover */
+    transform: translateY(-2px); /* Lift effect */
+    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
 }
 
-/* Footer */
-.footer {
+/* Footer/Contact Section */
+.contact-info {
     margin-top: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #555;
     text-align: center;
-    font-size: 0.8rem;
-    color: white;
+    line-height: 1.5;
 }
 
-#user-section {
-    text-align: center;
-    margin-top: 20px;
-}
+/* Responsive Design */
+@media (max-width: 768px) {
+    .login-container {
+        flex-direction: column;
+        height: auto;
+        width: 95%;
+    }
 
-#logout-btn {
-    padding: 10px 15px;
-    background-color: #007BFF;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
-    width: 100%;
-    margin-top: 10px;
-}
+    .sidebar {
+        width: 100%; /* Sidebar takes up full width on small screens */
+        border-radius: 20px 20px 0 0; /* Adjust for stacking */
+    }
 
-#logout-btn:hover {
-    background-color: #0056b3;
+    .main-content {
+        width: 100%;
+        border-radius: 0 0 20px 20px;
+    }
+
+    form {
+        width: 90%;
+    }
 }
