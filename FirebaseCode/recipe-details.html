@@ -15,8 +15,10 @@
         <div class="left-sidebar">
             <h3>Favoriten</h3>
             <div id="favourites-list">
-                <!-- Dynamische Favoriten-Liste -->
+                <h3>Deine Favoriten</h3>
+                <ul id="favorite-recipes"></ul>
             </div>
+            
         </div>
 
         <!-- Hauptinhalt -->
@@ -26,25 +28,26 @@
             <div id="recipe-details">
                 <h1 id="recipe-name"></h1>
                 <img id="recipe-image" src="" alt="Rezept Bild" class="recipe-image">
-                
+                <button id="favorite-button">Favorit</button> <!-- Neuer Button -->
                 <h3>Zutaten</h3>
-                <table id="recipe-amounts" class="amounts-table">
-                    <!-- Dynamische Tabelle der Zutaten -->
-                </table>
-
+                <table id="recipe-amounts" class="amounts-table"></table>
                 <p id="recipe-level"></p>
                 <p id="recipe-time"></p>
-                
                 <h3>Zubereitung</h3>
                 <p id="recipe-description"></p>
             </div>
+            
         </div>
 
         <!-- Rechte Seitenleiste -->
         <div class="right-sidebar">
             <a href="login.html">Account</a>
-            <p>Account-Details anzeigen...</p>
+            <div id="user-info">
+                <p id="user-status">Nicht eingeloggt</p>
+                <button id="logout-button" style="display: none;">Logout</button>
+            </div>
         </div>
+        
     </div>
 </body>
 </html>

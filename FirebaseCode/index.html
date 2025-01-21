@@ -1,68 +1,91 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KühlschrankKoch</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KühlschrankKoch</title>
+  <link rel="stylesheet" href="style.css">
 
-    <!-- Firebase UMD-Version -->
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+  <!-- Firebase UMD-Version -->
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
 
-    <!-- Eigener Script -->
-    <script defer src="script.js"></script>
-    <script src="env.js"></script>
+  <!-- Eigene Skripte -->
+  <script defer src="script.js"></script>
+  <script defer src="login.js"></script>
 </head>
 <body>
 
-    <!-- Container für das Layout -->
-    <div class="container">
-        <!-- Linke Spalte -->
-        <aside class="left-sidebar">
-            <h3>Favoriten</h3>
-            <p>Hier können später Favoriten angezeigt werden.</p>
-        </aside>
+  <!-- Hauptcontainer für das Layout -->
+  <div class="container">
 
-        <!-- Hauptinhalt -->
-        <main class="main-content">
-            <div class="überschrift">
-                <h1>Kühlschrank Koch</h1>
-            </div>
+    <!-- Linke Spalte (Favoriten, später eventuell weitere Features) -->
+    <aside class="left-sidebar">
+      <h3>Favoriten</h3>
+      <p>Hier können später Favoriten angezeigt werden.</p>
+    </aside>
 
-            <div class="zutaten">
-                <form id="ingredients-form">
-                    <div id="ingredients-section">
-                        <h2>Wähle deine Zutaten:</h2>
-                        <div id="ingredient-buttons" class="ingredient-buttons-container">
-                            <!-- Dynamische Buttons werden hier eingefügt -->
-                        </div>
-                    </div>
-                    
-                    <h2>Wähle deine Zutaten:</h2>
-                    <div id="ingredient-buttons">
-                        <button type="button" data-value="Salat">Salat</button>
-                        <button type="button" data-value="Tomaten">Tomaten</button>
-                        <button type="button" data-value="Gurken">Gurken</button>
-                        <button type="button" data-value="Pasta">Pasta</button>
-                        <button type="button" data-value="Speck">Speck</button>
-                    </div>
-                    <br>
-                    <button type="submit">Rezepte suchen</button>
-                </form>
+    <!-- Hauptinhalt -->
+    <main class="main-content">
+      <!-- Überschrift / Logo-Bereich -->
+      <div class="überschrift">
+        <h1>Kühlschrank Koch</h1>
+      </div>
 
-                <div id="recipes">
-                    <h2>Gefundene Rezepte:</h2>
-                </div>
-            </div>
-        </main>
+      <!-- Zutaten-Auswahl -->
+      <section class="zutaten">
+        <h2>Wähle deine Zutaten:</h2>
 
-        <!-- Rechte Spalte -->
-        <aside class="right-sidebar">
-            <a href="login.html">Account</a>
+        <!-- Dynamische Buttons für Zutaten -->
+        <div id="ingredient-buttons" class="ingredient-buttons-container"></div>
 
-            <p>Hier können später Account-Informationen angezeigt werden.</p>
-        </aside>
-    </div>
-</body>
-</html>
+        <!-- Button zum Ein-/Ausklappen weiterer Zutaten -->
+        <button id="toggle-more-ingredients" style="display: none;">Weitere Zutaten ausklappen</button>
+
+        <!-- Formular zum Absenden der ausgewählten Zutaten -->
+        <form id="ingredients-form">
+          <button type="submit">Rezepte suchen</button>
+        </form>
+      </section>
+
+      <!-- Bereich für die angezeigten Rezepte -->
+      <section id="recipes-section">
+        <div id="recipes"></div>
+      </section>
+    </main>
+
+    <!-- Rechte Spalte (Account-Bereich, Login/Logout) -->
+    <aside class="right-sidebar">
+      <div id="auth-section">
+        <h2>Account</h2>
+        <form id="auth-form">
+          <label for="email-or-username">Email oder Benutzername:</label>
+          <input type="text" id="email-or-username" placeholder="E-Mail oder Benutzername" required>
+
+          <label for="password">Password:</label>
+          <input type="password" id="password" placeholder="Passwort" required>
+
+          <div class="buttons">
+            <button type="button" id="login-btn">Login</button>
+            <form id="auth-form">
+              <!-- Anderer Inhalt -->
+              <button id="google-signup-btn" type="button">Mit Google registrieren</button>
+          </form>
+          
+
+          </div>
+        </form>
+      </div>
+
+      <!-- Bereich für eingeloggte Nutzer -->
+      <div id="user-section" style="display: none;">
+        <p id="user-email"></p>
+        <button id="logout-btn">Logout</button>
+      </div>
+    </aside>
+    <div id="email-verification-message" style="display: none; color: green; text-align: center;">
+      Bitte überprüfe deinen Posteingang, um deine E-Mail-Adresse zu bestätigen.
+  </div>
+  
+  </div>

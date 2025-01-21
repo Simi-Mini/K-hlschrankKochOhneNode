@@ -1,69 +1,135 @@
-console.log(window.env);
-
+// Firebase-Konfiguration
 const firebaseConfig = {
-    apiKey: window.env.FIREBASE_API_KEY,
-    authDomain: window.env.FIREBASE_AUTH_DOMAIN,
-    projectId: window.env.FIREBASE_PROJECT_ID,
-    storageBucket: window.env.FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: window.env.FIREBASE_MESSAGING_SENDER_ID,
-    appId: window.env.FIREBASE_APP_ID,
+    apiKey: "AIzaSyA61kcGoFKvMUz88mJhKYbB8FBbylGLT6g",
+    authDomain: "kuehlschrank-koch.firebaseapp.com",
+    projectId: "kuehlschrank-koch",
+    storageBucket: "kuehlschrank-koch.firebasestorage.app",
+    messagingSenderId: "107624432024",
+    appId: "1:107624432024:web:bc03288da99fa6d2092bed"
 };
 
+// Firebase initialisieren
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+const auth = firebase.auth();
 
+// Liste der ausgewählten Zutaten
+let selectedIngredients = [];
 
-
-// Datenbank-Verbindung testen
-async function testDatabaseConnection() {
+// Zutaten aus der Datenbank laden und Buttons generieren
+async function loadAllIngredients() {
     try {
         const recipesRef = db.collection("recipes");
         const querySnapshot = await recipesRef.get();
 
-        querySnapshot.forEach((doc) => {
-            console.log(`Rezept-ID: ${doc.id}, Daten:`, doc.data());
+        const uniqueIngredients = new Set();
+
+        // Zutaten aus den Rezepten sammeln
+        querySnapshot.forEach(doc => {
+            const recipe = doc.data();
+            if (recipe.ingredients && Array.isArray(recipe.ingredients)) {
+                recipe.ingredients.forEach(ingredient => uniqueIngredients.add(ingredient));
+            }
         });
 
-        alert("Verbindung erfolgreich! Siehe Konsole für Daten.");
+        const sortedIngredients = Array.from(uniqueIngredients).sort();
+        renderIngredientButtons(sortedIngredients);
     } catch (error) {
-        console.error("Fehler beim Abrufen der Daten:", error);
-        alert("Fehler: Überprüfe die Firebase-Verbindung.");
+        console.error("Fehler beim Laden der Zutaten:", error);
+        alert("Fehler beim Laden der Zutaten: " + error.message);
     }
 }
 
-window.onload = testDatabaseConnection;
+// Zutaten-Buttons generieren
+function renderIngredientButtons(ingredients) {
+    const ingredientContainer = document.getElementById("ingredient-buttons");
+    const toggleButton = document.getElementById("toggle-more-ingredients");
+    ingredientContainer.innerHTML = ""; // Bestehende Buttons löschen
 
+    ingredients.forEach(ingredient => {
+        const button = createIngredientButton(ingredient);
+        ingredientContainer.appendChild(button);
+    });
+
+    // Wenn mehr als 2 Reihen an Zutaten existieren, zeige den Toggle-Button
+    const maxVisibleHeight = 150; // Höhe, bei der die Box abgeschnitten wird
+    if (ingredientContainer.scrollHeight > maxVisibleHeight) {
+        toggleButton.style.display = "block";
+
+        toggleButton.addEventListener("click", () => {
+            const isExpanded = ingredientContainer.classList.toggle("expanded");
+            toggleButton.textContent = isExpanded ? "Zutaten einklappen" : "Weitere Zutaten ausklappen";
+        });
+    } else {
+        toggleButton.style.display = "none";
+    }
+}
+
+// Button für einzelne Zutat erstellen
+function createIngredientButton(ingredient) {
+    const button = document.createElement("button");
+    button.textContent = ingredient;
+    button.dataset.value = ingredient;
+    button.className = "ingredient-button";
+    button.addEventListener("click", () => toggleIngredientSelection(button)); // Klick-Event hinzufügen
+    return button;
+}
+
+// Zutaten-Auswahl toggeln
+function toggleIngredientSelection(button) {
+    const ingredient = button.dataset.value;
+
+    if (selectedIngredients.includes(ingredient)) {
+        // Zutat entfernen
+        selectedIngredients = selectedIngredients.filter(item => item !== ingredient);
+        button.classList.remove("active");
+    } else {
+        // Zutat hinzufügen
+        selectedIngredients.push(ingredient);
+        button.classList.add("active");
+    }
+
+    console.log("Ausgewählte Zutaten:", selectedIngredients); // Debugging
+}
+
+// Suche nach Rezepten starten, wenn der Button geklickt wird
+async function searchRecipesHandler(event) {
+    event.preventDefault(); // Verhindert Seiten-Neuladen
+    if (selectedIngredients.length === 0) {
+        alert("Bitte wähle mindestens eine Zutat aus!");
+        return;
+    }
+    console.log("Starte Rezeptsuche mit Zutaten:", selectedIngredients); // Debugging
+    searchRecipes(selectedIngredients); // Rezepte basierend auf ausgewählten Zutaten suchen
+}
+
+// Rezepte basierend auf ausgewählten Zutaten suchen
 async function searchRecipes(selectedIngredients) {
     try {
-        // Alle Rezepte aus der Datenbank abrufen
         const recipesRef = db.collection("recipes");
         const querySnapshot = await recipesRef.get();
 
         const recipesDiv = document.getElementById("recipes");
         recipesDiv.innerHTML = ""; // Alte Ergebnisse löschen
 
-        const completeRecipes = []; // Rezepte mit vollständigen Zutaten
-        const incompleteRecipes = []; // Rezepte mit fehlenden Zutaten
+        const completeRecipes = [];
+        const incompleteRecipes = [];
 
-        querySnapshot.forEach((doc) => {
+        querySnapshot.forEach(doc => {
             const recipe = doc.data();
             const recipeIngredients = recipe.ingredients;
 
-            // Fehlende Zutaten berechnen
             const missingIngredients = recipeIngredients.filter(
-                (ingredient) => !selectedIngredients.includes(ingredient)
+                ingredient => !selectedIngredients.includes(ingredient)
             );
 
             if (missingIngredients.length === 0) {
-                // Alle Zutaten vorhanden
                 completeRecipes.push(recipe);
             } else if (missingIngredients.length < recipeIngredients.length) {
-                // Einige Zutaten vorhanden, aber nicht alle
                 incompleteRecipes.push({ recipe, missingIngredients });
             }
         });
 
-        // 1. Rezepte, die du machen kannst
         if (completeRecipes.length > 0) {
             const completeSection = document.createElement("div");
             completeSection.classList.add("recipe-section");
@@ -75,8 +141,8 @@ async function searchRecipes(selectedIngredients) {
             const completeGrid = document.createElement("div");
             completeGrid.classList.add("recipe-grid");
 
-            completeRecipes.forEach((recipe) => {
-                const recipeCard = createRecipeCard(recipe); // Dynamische Rezeptkarte
+            completeRecipes.forEach(recipe => {
+                const recipeCard = createRecipeCard(recipe);
                 completeGrid.appendChild(recipeCard);
             });
 
@@ -84,7 +150,6 @@ async function searchRecipes(selectedIngredients) {
             recipesDiv.appendChild(completeSection);
         }
 
-        // 2. Unvollständige Rezepte
         if (incompleteRecipes.length > 0) {
             const incompleteSection = document.createElement("div");
             incompleteSection.classList.add("recipe-section");
@@ -97,7 +162,7 @@ async function searchRecipes(selectedIngredients) {
             incompleteGrid.classList.add("recipe-grid");
 
             incompleteRecipes.forEach(({ recipe, missingIngredients }) => {
-                const recipeCard = createRecipeCard(recipe, missingIngredients); // Dynamische Rezeptkarte
+                const recipeCard = createRecipeCard(recipe, missingIngredients);
                 incompleteGrid.appendChild(recipeCard);
             });
 
@@ -105,17 +170,17 @@ async function searchRecipes(selectedIngredients) {
             recipesDiv.appendChild(incompleteSection);
         }
 
-        // 3. Wenn keine Rezepte gefunden werden
         if (completeRecipes.length === 0 && incompleteRecipes.length === 0) {
             recipesDiv.innerHTML = "<p>Keine passenden Rezepte gefunden.</p>";
         }
     } catch (error) {
         console.error("Fehler beim Suchen der Rezepte:", error);
-        alert("Fehler beim Abrufen der Rezepte.");
+        alert("Fehler beim Suchen der Rezepte: " + error.message);
     }
 }
 
-function createRecipeCard(recipe) {
+// Dynamische Rezeptkarten erstellen
+function createRecipeCard(recipe, missingIngredients) {
     const recipeCard = document.createElement("div");
     recipeCard.classList.add("recipe-card");
 
@@ -128,253 +193,172 @@ function createRecipeCard(recipe) {
         <div class="recipe-content">
             <h3 class="recipe-title">${recipe.name}</h3>
             <p><strong>Ingredients:</strong> ${recipe.ingredients.join(", ")}</p>
-            <p><strong>Time:</strong> ${recipe.time} min | <strong>Expense:</strong> ${recipe.expense}</p>
+            <p><strong>Time:</strong> ${recipe.time} min</p>
         </div>
     `;
 
     recipeCard.appendChild(recipeImage);
     recipeCard.innerHTML += recipeDetails;
 
-    // Klick-Event hinzufügen
     recipeCard.addEventListener("click", () => {
-        console.log("Navigiere zu Rezept:", recipe.name); // Debugging
-        window.location.href = `recipe-details.html?name=${encodeURIComponent(recipe.name)}`; // Rezeptname in die URL einfügen
+        window.location.href = `recipe-details.html?name=${encodeURIComponent(recipe.name)}`;
     });
 
     return recipeCard;
 }
 
-// Rezepte aus Firestore laden
-async function loadRecipes() {
-    const recipesContainer = document.getElementById("recipes");
-    recipesContainer.innerHTML = "";
-
-    try {
-        // Firestore-Daten abrufen
-        const querySnapshot = await db.collection("recipes").get();
-
-        querySnapshot.forEach((doc) => {
-            const recipe = doc.data();
-            recipe.id = doc.id; // Setze die automatisch generierte Dokument-ID
-            const recipeCard = createRecipeCard(recipe);
-            recipesContainer.appendChild(recipeCard);
-        });
-    } catch (error) {
-        console.error("Fehler beim Laden der Rezepte:", error);
-    }
-}
-
-
-// Zutaten-Auswahl mit Buttons
-const ingredientButtons = document.querySelectorAll('#ingredient-buttons button');
-let selectedIngredients = [];
-
-ingredientButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        const ingredient = button.getAttribute('data-value');
-        if (selectedIngredients.includes(ingredient)) {
-            // Zutat entfernen
-            selectedIngredients = selectedIngredients.filter(item => item !== ingredient);
-            button.classList.remove('active');
-        } else {
-            // Zutat hinzufügen
-            selectedIngredients.push(ingredient);
-            button.classList.add('active');
-        }
-    });
-});
-
 // Event-Listener für das Formular
-const form = document.getElementById("ingredients-form");
-form.addEventListener("submit", (event) => {
-    event.preventDefault(); // Verhindert Seiten-Neuladen
-    searchRecipes(selectedIngredients); // Rezepte suchen
-});
+document.getElementById("ingredients-form").addEventListener("submit", searchRecipesHandler);
 
-// Firebase Auth-Referenz
-const auth = firebase.auth();
+// Event-Listener für das Laden der Zutaten
+document.addEventListener("DOMContentLoaded", () => {
+    loadAllIngredients(); // Lade alle Zutaten beim Start
+});
 
 // Login-Funktion
 async function login() {
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
+    const emailOrUsername = document.getElementById("email-or-username").value.trim();
+    const password = document.getElementById("password").value.trim();
 
     try {
+        let email = emailOrUsername;
+
+        // Prüfen, ob es eine Email ist
+        if (!isEmail(emailOrUsername)) {
+            const querySnapshot = await db.collection("users")
+                .where("username", "==", emailOrUsername)
+                .get();
+
+            if (querySnapshot.empty) {
+                throw new Error("Benutzername nicht gefunden.");
+            }
+
+            // Benutzername zu Email umwandeln
+            email = querySnapshot.docs[0].data().email;
+        }
+
+        // Login mit der Email
         const userCredential = await auth.signInWithEmailAndPassword(email, password);
-        alert("Eingeloggt als: " + userCredential.user.email);
-        showUserInfo(userCredential.user);
+        const user = userCredential.user;
+
+        alert(`Login erfolgreich! Willkommen, ${user.email}`);
+        updateUI(user);
     } catch (error) {
+        console.error("Fehler beim Login:", error);
         alert("Fehler beim Login: " + error.message);
     }
 }
 
-// Registrierung-Funktion
+// Registrierung
 async function register() {
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
+    const username = document.getElementById("username").value.trim();
+    const email = document.getElementById("email-or-username").value.trim();
+    const password = document.getElementById("password").value.trim();
+
+    if (!username) {
+        alert("Bitte einen Benutzernamen eingeben.");
+        return;
+    }
 
     try {
         const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-        alert("Registrierung erfolgreich! Eingeloggt als: " + userCredential.user.email);
-        showUserInfo(userCredential.user);
+        const user = userCredential.user;
+
+        // Benutzername in der Firestore-Datenbank speichern
+        await db.collection("users").doc(user.uid).set({
+            username: username,
+            email: email,
+        });
+
+        // Bestätigungs-E-Mail senden
+        await user.sendEmailVerification();
+        alert("Registrierung erfolgreich! Bitte bestätige deine E-Mail-Adresse.");
+        updateUI(user);
     } catch (error) {
+        console.error("Fehler bei der Registrierung:", error);
         alert("Fehler bei der Registrierung: " + error.message);
     }
 }
 
+
 // Logout-Funktion
 function logout() {
-    auth.signOut().then(() => {
-        alert("Abgemeldet!");
-        document.getElementById("user-info").style.display = "none";
-        document.getElementById("login-form").style.display = "block";
-    });
+    auth.signOut()
+        .then(() => {
+            alert("Erfolgreich ausgeloggt!");
+            updateUI(null);
+        })
+        .catch((error) => {
+            console.error("Fehler beim Logout:", error);
+        });
 }
 
-// Benutzerinfo anzeigen
-function showUserInfo(user) {
-    document.getElementById("login-form").style.display = "none";
-    document.getElementById("user-info").style.display = "block";
-    document.getElementById("user-email").textContent = "Angemeldet als: " + user.email;
+// UI aktualisieren
+function updateUI(user) {
+    if (user) {
+        document.getElementById("auth-section").style.display = "none";
+        document.getElementById("user-section").style.display = "block";
+        document.getElementById("user-email").textContent = `Angemeldet als: ${user.email}`;
+    } else {
+        document.getElementById("auth-section").style.display = "block";
+        document.getElementById("user-section").style.display = "none";
+    }
+}
+
+// Überwache Login-Status
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        updateUI(user);
+    } else {
+        updateUI(null);
+    }
+});
+
+// E-Mail-Validierung
+function isEmail(input) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(input);
 }
 
 // Event-Listener
-document.getElementById("login-btn").addEventListener("click", login);
-document.getElementById("register-btn").addEventListener("click", register);
-document.getElementById("logout-btn").addEventListener("click", logout);
+if (document.getElementById("login-btn")) {
+    document.getElementById("login-btn").addEventListener("click", login);
+}
+if (document.getElementById("register-btn")) {
+    document.getElementById("register-btn").addEventListener("click", register);
+}
+if (document.getElementById("logout-btn")) {
+    document.getElementById("logout-btn").addEventListener("click", logout);
+}
 
-// Benutzerstatus überwachen
-auth.onAuthStateChanged((user) => {
-    if (user) {
-        showUserInfo(user);
-    } else {
-        document.getElementById("user-info").style.display = "none";
-        document.getElementById("login-form").style.display = "block";
-    }
-});
-
-// Favoriten speichern
-async function likeRecipe(recipeId, recipeName, recipeLevel, recipeTime) {
-    const user = auth.currentUser;
-    if (!user) {
-        alert("Bitte logge dich ein, um Favoriten hinzuzufügen.");
-        return;
-    }
-
-    const favoritesRef = firebase.firestore().collection("users").doc(user.uid).collection("favorites");
+// Google Signup Funktion
+async function googleSignup() {
+    console.log("Google-Signup gestartet"); // Debugging
+    const provider = new firebase.auth.GoogleAuthProvider();
     try {
-        await favoritesRef.doc(recipeId).set({
-            name: recipeName,
-            level: recipeLevel,
-            time: recipeTime
-        });
-        alert("Rezept wurde zu Favoriten hinzugefügt!");
-        loadFavorites(); // Aktualisiere die Favoritenliste
+        const result = await auth.signInWithPopup(provider);
+        const user = result.user;
+
+        // Benutzer in Firestore speichern, falls neu
+        const userDoc = await db.collection("users").doc(user.uid).get();
+        if (!userDoc.exists) {
+            await db.collection("users").doc(user.uid).set({
+                username: user.displayName || "Google-Benutzer",
+                email: user.email,
+            });
+        }
+
+        alert(`Willkommen, ${user.displayName || "Benutzer"}!`);
+        updateUI(user);
     } catch (error) {
-        alert("Fehler beim Hinzufügen zu Favoriten: " + error.message);
+        console.error("Fehler beim Google-Signup:", error);
+        alert("Fehler beim Google-Signup: " + error.message);
     }
 }
 
-// Favoriten laden
-async function loadFavorites() {
-    const user = auth.currentUser;
-    if (!user) return;
-
-    const favoritesRef = firebase.firestore().collection("users").doc(user.uid).collection("favorites");
-    try {
-        const snapshot = await favoritesRef.get();
-        const favoritesList = document.querySelector(".left-sidebar");
-        favoritesList.innerHTML = "<h3>Favoriten</h3>";
-
-        snapshot.forEach((doc) => {
-            const favorite = doc.data();
-            const favoriteItem = document.createElement("div");
-            favoriteItem.textContent = `${favorite.name} - Level: ${favorite.level}, Time: ${favorite.time} min`;
-            favoritesList.appendChild(favoriteItem);
-        });
-    } catch (error) {
-        alert("Fehler beim Laden der Favoriten: " + error.message);
-    }
-}
-
-async function loadIngredients() {
-    try {
-        const querySnapshot = await db.collection("recipes").get();
-        const allIngredients = new Set(); // Set für einzigartige Zutaten
-
-        // Iteriere über alle Rezepte und sammle Zutaten
-        querySnapshot.forEach(doc => {
-            const recipe = doc.data();
-            if (recipe.ingredients && Array.isArray(recipe.ingredients)) {
-                recipe.ingredients.forEach(ingredient => allIngredients.add(ingredient));
-            }
-        });
-
-        // Umwandeln von Set zu Array und alphabetisch sortieren
-        const sortedIngredients = Array.from(allIngredients).sort();
-
-        // Zutaten in Buttons anzeigen
-        renderIngredientButtons(sortedIngredients);
-    } catch (error) {
-        console.error("Fehler beim Laden der Zutaten:", error);
-        alert("Fehler beim Laden der Zutaten: " + error.message);
-    }
-}
-
-function renderIngredientButtons(ingredients) {
-    const ingredientContainer = document.getElementById("ingredient-buttons");
-    ingredientContainer.innerHTML = ""; // Bestehende Buttons entfernen
-
-    const maxVisibleButtons = 10; // Maximale Anzahl sichtbarer Buttons
-    const visibleIngredients = ingredients.slice(0, maxVisibleButtons);
-    const hiddenIngredients = ingredients.slice(maxVisibleButtons);
-
-    // Sichtbare Buttons generieren
-    visibleIngredients.forEach(ingredient => {
-        const button = createIngredientButton(ingredient);
-        ingredientContainer.appendChild(button);
+if (document.getElementById("google-signup-btn")) {
+    document.getElementById("google-signup-btn").addEventListener("click", (event) => {
+        event.preventDefault(); // Verhindert das Neuladen der Seite
+        googleSignup(); // Ruft die Google-Signup-Funktion auf
     });
-
-    // Wenn es versteckte Zutaten gibt, füge einen "Noch mehr Zutaten"-Button hinzu
-    if (hiddenIngredients.length > 0) {
-        const moreButton = document.createElement("button");
-        moreButton.textContent = "Noch mehr Zutaten";
-        moreButton.className = "more-ingredients-button";
-        moreButton.onclick = () => renderHiddenIngredientButtons(hiddenIngredients);
-        ingredientContainer.appendChild(moreButton);
-    }
 }
-
-function renderHiddenIngredientButtons(hiddenIngredients) {
-    const ingredientContainer = document.getElementById("ingredient-buttons");
-
-    // Versteckte Zutaten-Buttons generieren
-    hiddenIngredients.forEach(ingredient => {
-        const button = createIngredientButton(ingredient);
-        ingredientContainer.appendChild(button);
-    });
-
-    // Entferne den "Noch mehr Zutaten"-Button nach Klick
-    const moreButton = document.querySelector(".more-ingredients-button");
-    if (moreButton) {
-        moreButton.remove();
-    }
-}
-
-function createIngredientButton(ingredient) {
-    const button = document.createElement("button");
-    button.textContent = ingredient;
-    button.dataset.value = ingredient; // Attribut für den Zutatenwert
-    button.className = "ingredient-button";
-    button.onclick = () => toggleIngredientSelection(button);
-    return button;
-}
-
-function toggleIngredientSelection(button) {
-    button.classList.toggle("active");
-    // Hier kannst du eine Funktion hinzufügen, um ausgewählte Zutaten zu speichern
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-    loadIngredients();
-});
