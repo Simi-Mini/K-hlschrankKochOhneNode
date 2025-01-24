@@ -362,3 +362,66 @@ if (document.getElementById("google-signup-btn")) {
         googleSignup(); // Ruft die Google-Signup-Funktion auf
     });
 }
+
+// Favoritenliste laden
+async function loadFavorites() {
+    const user = firebase.auth().currentUser;
+    if (!user) return;
+
+    const favoritesList = document.getElementById("favorite-recipes");
+    favoritesList.innerHTML = "";
+
+    try {
+        const querySnapshot = await db
+            .collection("users")
+            .doc(user.uid)
+            .collection("favorites")
+            .orderBy("timestamp", "desc")
+            .get();
+
+        querySnapshot.forEach((doc) => {
+            const favorite = doc.data();
+            const listItem = document.createElement("li");
+            listItem.textContent = favorite.name;
+            favoritesList.appendChild(listItem);
+        });
+    } catch (error) {
+        console.error("Fehler beim Laden der Favoriten:", error);
+    }
+}
+
+// Favoriten beim Login laden
+firebase.auth().onAuthStateChanged((user) => {
+    if (user) {
+        loadFavorites();
+    }
+});
+
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        console.log("Benutzer eingeloggt:", user.email);
+        updateUI(user); // Passe die Benutzeroberfläche an
+    } else {
+        console.log("Benutzer nicht eingeloggt.");
+        updateUI(null);
+    }
+});
+
+function updateUI(user) {
+    if (user) {
+        document.getElementById("auth-section").style.display = "none";
+        document.getElementById("user-section").style.display = "block";
+        document.getElementById("user-email").textContent = `Angemeldet als: ${user.email}`;
+    } else {
+        document.getElementById("auth-section").style.display = "block";
+        document.getElementById("user-section").style.display = "none";
+    }
+}
+
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        localStorage.setItem("user", JSON.stringify({ email: user.email, uid: user.uid }));
+    } else {
+        localStorage.removeItem("user");
+    }
+});

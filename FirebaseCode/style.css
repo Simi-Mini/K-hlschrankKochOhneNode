@@ -448,3 +448,22 @@
      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
    }
    
+
+   #favorite-recipes {
+    list-style: none;
+    padding: 0;
+}
+
+#favorite-recipes li {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    margin: 5px 0;
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#favorite-recipes li:hover {
+    background-color: #e9ecef;
+}
