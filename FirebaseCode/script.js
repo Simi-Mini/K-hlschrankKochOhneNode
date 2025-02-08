@@ -213,6 +213,7 @@ document.getElementById("ingredients-form").addEventListener("submit", searchRec
 // Event-Listener für das Laden der Zutaten
 document.addEventListener("DOMContentLoaded", () => {
     loadAllIngredients(); // Lade alle Zutaten beim Start
+    loadFavorites(); // Lade Favoriten beim Start
 });
 
 // Login-Funktion
@@ -363,50 +364,126 @@ if (document.getElementById("google-signup-btn")) {
     });
 }
 
-// Favoritenliste laden
-async function loadFavorites() {
-    const user = firebase.auth().currentUser;
-    if (!user) return;
+// Global: Stelle sicher, dass currentRecipe (das aktuell geladene Rezept)
+// in deiner loadRecipeDetails-Funktion gesetzt wird.
+let currentRecipe = null;
 
-    const favoritesList = document.getElementById("favorite-recipes");
-    favoritesList.innerHTML = "";
+/**
+ * Funktion, um Favoriten in der linken Sidebar zu laden.
+ * Achtung: In deiner recipe-details.html muss ein Element mit der ID "favorite-recipes" vorhanden sein.
+ */
+function loadFavorites() {
+  const user = firebase.auth().currentUser;
+  if (!user) return;
 
-    try {
-        const querySnapshot = await db
-            .collection("users")
-            .doc(user.uid)
-            .collection("favorites")
-            .orderBy("timestamp", "desc")
-            .get();
+  const favoritesList = document.getElementById("favorite-recipes");
+  if (!favoritesList) return; // Falls das Element nicht existiert
 
-        querySnapshot.forEach((doc) => {
-            const favorite = doc.data();
-            const listItem = document.createElement("li");
-            listItem.textContent = favorite.name;
-            favoritesList.appendChild(listItem);
-        });
-    } catch (error) {
-        console.error("Fehler beim Laden der Favoriten:", error);
-    }
+  favoritesList.innerHTML = "";
+
+  db.collection("users")
+    .doc(user.uid)
+    .collection("favorites")
+    .orderBy("timestamp", "desc")
+    .get()
+    .then((querySnapshot) => {
+      querySnapshot.forEach((doc) => {
+        const favorite = doc.data();
+        const listItem = document.createElement("li");
+        listItem.innerHTML = `
+          <div class="favorite-item">
+            <span class="favorite-name">${favorite.name}</span>
+            <span class="favorite-level">Level: ${favorite.level || "-"}</span>
+          </div>
+        `;
+        favoritesList.appendChild(listItem);
+      });
+    })
+    .catch((error) => {
+      console.error("Fehler beim Laden der Favoriten:", error);
+    });
 }
 
-// Favoriten beim Login laden
-firebase.auth().onAuthStateChanged((user) => {
-    if (user) {
-        loadFavorites();
-    }
-});
+/**
+ * Funktion, um ein Rezept als Favorit hinzuzufügen oder zu entfernen.
+ */
+function toggleFavorite() {
+  const user = firebase.auth().currentUser;
+  if (!user) {
+    alert("Bitte loggen Sie sich ein, um Favoriten zu verwalten.");
+    return;
+  }
 
-auth.onAuthStateChanged((user) => {
-    if (user) {
-        console.log("Benutzer eingeloggt:", user.email);
-        updateUI(user); // Passe die Benutzeroberfläche an
-    } else {
-        console.log("Benutzer nicht eingeloggt.");
-        updateUI(null);
-    }
-});
+  const recipeName = document.getElementById("recipe-name").textContent;
 
+  const favoriteRef = db
+    .collection("users")
+    .doc(user.uid)
+    .collection("favorites")
+    .doc(recipeName);
+
+  favoriteRef
+    .get()
+    .then((docSnapshot) => {
+      if (docSnapshot.exists) {
+        // Favorit entfernen
+        return favoriteRef.delete().then(() => {
+          alert(`${recipeName} wurde aus deinen Favoriten entfernt.`);
+          updateFavoriteButton(false);
+        });
+      } else {
+        // Favorit hinzufügen – currentRecipe muss vorher in loadRecipeDetails gesetzt worden sein!
+        const recipeImage = document.getElementById("recipe-image").src;
+        return favoriteRef.set({
+          name: recipeName,
+          image: recipeImage,
+          level: currentRecipe.level, // Speichere das Level mit
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        }).then(() => {
+          alert(`${recipeName} wurde zu deinen Favoriten hinzugefügt.`);
+          updateFavoriteButton(true);
+        });
+      }
+    })
+    .then(() => {
+      // Nach erfolgreicher Änderung: Favoritenliste neu laden
+      loadFavorites();
+    })
+    .catch((error) => {
+      console.error("Fehler beim Verwalten der Favoriten:", error);
+      alert("Fehler beim Verwalten der Favoriten: " + error.message);
+    });
+}
+
+/**
+ * Beispielhafte Funktion, um den Button-Status zu aktualisieren.
+ * Passe diese Funktion an dein Design an.
+ */
+function updateFavoriteButton(isFavorite) {
+  const favoriteButton = document.getElementById("favorite-button");
+  if (isFavorite) {
+    favoriteButton.textContent = "Aus Favoriten entfernen";
+    favoriteButton.style.backgroundColor = "#e53935";
+  } else {
+    favoriteButton.textContent = "Zu Favoriten hinzufügen";
+    favoriteButton.style.backgroundColor = "#ff9800";
+  }
+}
+
+  
+  
+
+
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+  .then(() => {
+    // Jetzt wird der Login-Zustand auch bei Seitenwechseln beibehalten.
+  })
+  .catch((error) => {
+    console.error("Fehler beim Setzen der Persistenz:", error);
+  });
+
+
+// Funktion zum Aktualisieren der Benutzeroberfläche
 function updateUI(user) {
     if (user) {
         document.getElementById("auth-section").style.display = "none";
@@ -418,10 +495,13 @@ function updateUI(user) {
     }
 }
 
-auth.onAuthStateChanged((user) => {
+// Beim Laden der Seite den Login-Status überprüfen
+document.addEventListener("DOMContentLoaded", () => {
+    const user = JSON.parse(localStorage.getItem("user"));
+
     if (user) {
-        localStorage.setItem("user", JSON.stringify({ email: user.email, uid: user.uid }));
+        updateUI(user);
     } else {
-        localStorage.removeItem("user");
+        updateUI(null);
     }
 });

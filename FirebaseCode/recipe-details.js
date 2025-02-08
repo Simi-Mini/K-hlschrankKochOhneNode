@@ -10,6 +10,8 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+let currentRecipe = null;
+
 // Rezeptname aus der URL holen
 function getRecipeNameFromURL() {
     const params = new URLSearchParams(window.location.search);
@@ -50,7 +52,6 @@ function renderAmountsTable(amounts) {
     });
 }
 
-// Rezeptdetails laden
 async function loadRecipeDetails(recipeName) {
     if (!recipeName) {
         alert("Kein Rezept ausgewählt.");
@@ -70,6 +71,9 @@ async function loadRecipeDetails(recipeName) {
         const recipeDoc = querySnapshot.docs[0];
         const recipe = recipeDoc.data();
 
+        // Speichert das Rezept in der globalen Variable
+        currentRecipe = recipe;
+
         document.getElementById("recipe-name").textContent = recipe.name || "Unbekanntes Rezept";
         document.getElementById("recipe-image").src = recipe.image || "https://via.placeholder.com/600";
         document.getElementById("recipe-description").textContent = recipe.beschreibung || "Keine Beschreibung verfügbar.";
@@ -84,6 +88,7 @@ async function loadRecipeDetails(recipeName) {
         alert("Fehler beim Laden der Rezeptdetails: " + error.message);
     }
 }
+
 
 // Favoriten-Button aktualisieren
 function updateFavoriteButton(isFavorite) {
@@ -119,46 +124,51 @@ async function checkIfFavorite() {
     }
 }
 
-// Favorit hinzufügen oder entfernen
 async function toggleFavorite() {
     const user = firebase.auth().currentUser;
     if (!user) {
-        alert("Bitte loggen Sie sich ein, um Favoriten zu verwalten.");
-        return;
+      alert("Bitte loggen Sie sich ein, um Favoriten zu verwalten.");
+      return;
     }
-
+  
     const recipeName = document.getElementById("recipe-name").textContent;
-
+  
     try {
-        const favoriteRef = db
-            .collection("users")
-            .doc(user.uid)
-            .collection("favorites")
-            .doc(recipeName);
-
-        const doc = await favoriteRef.get();
-
-        if (doc.exists) {
-            await favoriteRef.delete();
-            alert(`${recipeName} wurde aus deinen Favoriten entfernt.`);
-            updateFavoriteButton(false);
-        } else {
-            const recipeImage = document.getElementById("recipe-image").src;
-
-            await favoriteRef.set({
-                name: recipeName,
-                image: recipeImage,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-            });
-
-            alert(`${recipeName} wurde zu deinen Favoriten hinzugefügt.`);
-            updateFavoriteButton(true);
-        }
+      const favoriteRef = db
+        .collection("users")
+        .doc(user.uid)
+        .collection("favorites")
+        .doc(recipeName);
+  
+      const docSnapshot = await favoriteRef.get();
+  
+      if (docSnapshot.exists) {
+        await favoriteRef.delete();
+        alert(`${recipeName} wurde aus deinen Favoriten entfernt.`);
+        updateFavoriteButton(false);
+      } else {
+        const recipeImage = document.getElementById("recipe-image").src;
+        // Voraussetzung: currentRecipe wird in loadRecipeDetails gesetzt.
+        await favoriteRef.set({
+          name: recipeName,
+          image: recipeImage,
+          level: currentRecipe.level, // Level wird hier mitgespeichert
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        });
+        alert(`${recipeName} wurde zu deinen Favoriten hinzugefügt.`);
+        updateFavoriteButton(true);
+      }
+      // Nach dem Ändern der Favoriten wird die Favoritenliste aktualisiert:
+      loadFavorites();
     } catch (error) {
-        console.error("Fehler beim Verwalten der Favoriten:", error);
-        alert("Fehler beim Verwalten der Favoriten: " + error.message);
+      console.error("Fehler beim Verwalten der Favoriten:", error);
+      alert("Fehler beim Verwalten der Favoriten: " + error.message);
     }
-}
+  }
+  
+
+  
+
 
 // Event-Listener für Favoriten-Button
 document.getElementById("favorite-button").addEventListener("click", toggleFavorite);
@@ -175,23 +185,52 @@ firebase.auth().onAuthStateChanged((user) => {
     }
 });
 
-auth.onAuthStateChanged((user) => {
+// Überwache Login-Status
+firebase.auth().onAuthStateChanged((user) => {
     if (user) {
-        console.log("Benutzer eingeloggt:", user.email);
-        updateUI(user); // Passe die Benutzeroberfläche an
+        // Speichere den Benutzer in localStorage
+        localStorage.setItem("user", JSON.stringify({ email: user.email, uid: user.uid }));
+        updateUI(user);
     } else {
-        console.log("Benutzer nicht eingeloggt.");
+        // Entferne den Benutzer aus localStorage
+        localStorage.removeItem("user");
         updateUI(null);
     }
 });
 
+// Funktion zum Aktualisieren der Benutzeroberfläche
 function updateUI(user) {
+    const userInfo = document.getElementById("user-info");
+    const userStatus = document.getElementById("user-status");
+    const logoutButton = document.getElementById("logout-button");
+
     if (user) {
-        document.getElementById("auth-section").style.display = "none";
-        document.getElementById("user-section").style.display = "block";
-        document.getElementById("user-email").textContent = `Angemeldet als: ${user.email}`;
+        userInfo.style.display = "block";
+        userStatus.textContent = `Eingeloggt als: ${user.email}`;
+        logoutButton.style.display = "block";
     } else {
-        document.getElementById("auth-section").style.display = "block";
-        document.getElementById("user-section").style.display = "none";
+        userInfo.style.display = "none";
+        userStatus.textContent = "Nicht eingeloggt";
+        logoutButton.style.display = "none";
     }
 }
+
+// Beim Laden der Seite den Login-Status überprüfen
+document.addEventListener("DOMContentLoaded", () => {
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    if (user) {
+        updateUI(user);
+    } else {
+        updateUI(null);
+    }
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    const backButton = document.getElementById("back-to-home");
+    if (backButton) {
+        backButton.addEventListener("click", () => {
+            window.location.href = "index.html"; // Navigiert zur Startseite
+        });
+    }
+});
