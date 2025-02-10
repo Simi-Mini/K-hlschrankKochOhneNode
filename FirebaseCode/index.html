@@ -4,30 +4,23 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>KühlschrankKoch</title>
-  <link rel="stylesheet" href="style.css">
-
-  <!-- Firebase UMD-Version -->
   <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
-
-
-  <!-- Eigene Skripte -->
   <script defer src="script.js"></script>
-  <script defer src="login.js"></script>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-  <!-- Hauptcontainer für das Layout -->
   <div class="container">
-
-    <!-- Linke Spalte (Favoriten, später eventuell weitere Features) -->
-    <aside class="left-sidebar">
-      <h3>Favoriten</h3>
-      <ul id="favorite-recipes"></ul>
-  </aside>
+    <!-- Linke Seitenleiste -->
+    <div class="left-sidebar">
+        <h3>Favoriten</h3>
+        <div id="favourites-list">
+          <h3>Deine Favoriten</h3>
+          <ul id="favorite-recipes"></ul>
+        </div>
+      </div>
   
-
     <!-- Hauptinhalt -->
     <main class="main-content">
       <!-- Überschrift / Logo-Bereich -->
@@ -64,30 +57,28 @@
         <form id="auth-form">
           <label for="email-or-username">Email oder Benutzername:</label>
           <input type="text" id="email-or-username" placeholder="E-Mail oder Benutzername" required>
-
+    
           <label for="password">Password:</label>
           <input type="password" id="password" placeholder="Passwort" required>
-
+    
           <div class="buttons">
             <button type="button" id="login-btn">Login</button>
             <form id="auth-form">
-              <!-- Anderer Inhalt -->
               <button id="google-signup-btn" type="button">Mit Google registrieren</button>
-          </form>
-          
-
+            </form>
           </div>
         </form>
       </div>
-
-
+    
       <div id="user-section" style="display: none;">
         <p id="user-email"></p>
         <button id="logout-btn">Logout</button>
       </div>
+    
+      <!-- Neuer Projektinfo-Bereich -->
+      <div class="project-info">
+        <h3>Über das Projekt</h3>
+        <p>Dieses Projekt wurde von Simon Rapp und Gideon Rüscher im Rahmen des Programmierprojekt des 1.Halbjahres in der 4.Klasse im Unterricht von Michael Leeb an der HTL Dornbirn entwickelt.</p>
+        <p>Die Schwierigkeitsgrade der Rezepte reichen von 1 (leicht) bis 5 (Michael Leeb).</p>
+      </div>
     </aside>
-    <div id="email-verification-message" style="display: none; color: green; text-align: center;">
-      Bitte überprüfe deinen Posteingang, um deine E-Mail-Adresse zu bestätigen.
-  </div>
-  
-  </div>

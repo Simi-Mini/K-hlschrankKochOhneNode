@@ -1,6 +1,4 @@
-/* -------------------------------------------------------------
-   1. Grundlegende Stile
-   ------------------------------------------------------------- */
+
    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
 
    * {
@@ -11,14 +9,12 @@
    
    body {
      font-family: 'Inter', sans-serif;
-     background-color: #F6F7F9;  /* Dezenter, moderner Grauton */
+     background-color: #F6F7F9;  
      color: #333;
      line-height: 1.6;
    }
    
-   /* -------------------------------------------------------------
-      2. Layout-Container
-      ------------------------------------------------------------- */
+
    .container {
      display: grid;
      grid-template-columns: 1fr 3fr 1fr;
@@ -530,4 +526,111 @@ body {
   right: 10px;
   font-size: 1.5rem;
   cursor: pointer;
+}
+
+/* Favoritenliste in der linken Sidebar */
+#favorite-recipes {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.favorite-item {
+  display: flex;
+  align-items: center;
+  background: #f8f8f8;
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.favorite-item:hover {
+  background: #e0e0e0;
+}
+
+.favorite-thumbnail {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 5px;
+  margin-right: 10px;
+}
+
+.favorite-info h4 {
+  margin: 0;
+  font-size: 1.1em;
+}
+
+.favorite-info p {
+  margin: 4px 0 0 0;
+  font-size: 0.9em;
+  color: #555;
+}
+
+/* Rezeptkarten styling (Beispiel) */
+.recipe-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
+}
+
+.recipe-card:hover {
+  transform: scale(1.02);
+}
+
+.recipe-content {
+  padding: 15px;
+}
+
+.recipe-title {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 1.3em;
+}
+
+/* Rechte Spalte – Projektinfo-Bereich */
+.right-sidebar {
+  background: #f2f2f2;  /* Heller Hintergrund für die ganze rechte Spalte */
+  padding: 15px;
+  border-radius: 5px;
+  margin-top: 20px;
+}
+
+.project-info {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px 15px;
+  margin-top: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.project-info h3 {
+  margin-top: 0;
+  font-size: 1.2em;
+  color: #333;
+}
+
+.project-info p {
+  font-size: 0.95em;
+  line-height: 1.4;
+  color: #555;
+  margin: 8px 0;
+}
+
+/* Standard: Container hat eine maximale Höhe, überlaufender Inhalt wird ausgeblendet */
+.ingredient-buttons-container {
+  max-height: 150px;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+/* Wenn die Klasse "expanded" hinzugefügt wird, wird die maximale Höhe aufgehoben */
+.ingredient-buttons-container.expanded {
+  max-height: none;
 }

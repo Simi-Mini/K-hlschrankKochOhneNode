@@ -8,20 +8,19 @@
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
-    
     <script defer src="recipe-details.js"></script>
 </head>
 <body>
     <div class="container">
-        <!-- Linke Seitenleiste -->
-        <div class="left-sidebar">
-            <h3>Favoriten</h3>
-            <div id="favourites-list">
-                <h3>Deine Favoriten</h3>
-                <ul id="favorite-recipes"></ul>
-            </div>
-            
-        </div>
+<!-- Linke Seitenleiste -->
+<div class="left-sidebar">
+    <h3>Favoriten</h3>
+    <div id="favourites-list">
+      <h3>Deine Favoriten</h3>
+      <ul id="favorite-recipes"></ul>
+    </div>
+  </div>
+  
 
         <!-- Hauptinhalt -->
         <div class="main-content">
@@ -42,14 +41,20 @@
         </div>
 
         <!-- Rechte Seitenleiste -->
-        <div class="right-sidebar">
-            <a href="login.html">Account</a>
-            <div id="user-info">
-                <p id="user-status">Nicht eingeloggt</p>
-                <button id="logout-button" style="display: none;">Logout</button>
-            </div>
-        </div>
-        
+        <!-- Rechte Seitenleiste -->
+<div class="right-sidebar">
+    <div id="user-info">
+      <p id="user-status">Nicht eingeloggt</p>
+      <button id="logout-button" style="display: none;">Logout</button>
     </div>
+    
+    <!-- Neuer Projektinfo-Bereich -->
+    <div class="project-info">
+      <h3>Über das Projekt</h3>
+      <p>Dieses Projekt wurde von Simon Rapp und Gideon Rüscher im Rahmen des Programmierprojekt des 1.Halbjahres in der 4.Klasse im Unterricht von Michael Leeb an der HTL Dornbirn entwickelt..</p>
+      <p>Die Schwierigkeitsgrade der Rezepte reichen von 1 (leicht) bis 5 (Michael Leeb).</p>
+    </div>
+  </div>
+  
 </body>
 </html>

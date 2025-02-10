@@ -40,7 +40,6 @@ async function loadAllIngredients() {
     }
 }
 
-// Zutaten-Buttons generieren
 function renderIngredientButtons(ingredients) {
     const ingredientContainer = document.getElementById("ingredient-buttons");
     const toggleButton = document.getElementById("toggle-more-ingredients");
@@ -55,15 +54,11 @@ function renderIngredientButtons(ingredients) {
     const maxVisibleHeight = 150; // Höhe, bei der die Box abgeschnitten wird
     if (ingredientContainer.scrollHeight > maxVisibleHeight) {
         toggleButton.style.display = "block";
-
-        toggleButton.addEventListener("click", () => {
-            const isExpanded = ingredientContainer.classList.toggle("expanded");
-            toggleButton.textContent = isExpanded ? "Zutaten einklappen" : "Weitere Zutaten ausklappen";
-        });
     } else {
         toggleButton.style.display = "none";
     }
 }
+
 
 // Button für einzelne Zutat erstellen
 function createIngredientButton(ingredient) {
@@ -179,33 +174,35 @@ async function searchRecipes(selectedIngredients) {
     }
 }
 
-// Dynamische Rezeptkarten erstellen
 function createRecipeCard(recipe, missingIngredients) {
     const recipeCard = document.createElement("div");
     recipeCard.classList.add("recipe-card");
-
+  
     const recipeImage = document.createElement("img");
     recipeImage.src = recipe.image;
     recipeImage.alt = recipe.name;
     recipeImage.classList.add("recipe-image");
-
+  
+    // Zeige Name, Zutaten, Zeit und Level an
     const recipeDetails = `
         <div class="recipe-content">
             <h3 class="recipe-title">${recipe.name}</h3>
-            <p><strong>Ingredients:</strong> ${recipe.ingredients.join(", ")}</p>
-            <p><strong>Time:</strong> ${recipe.time} min</p>
+            <p><strong>Zutaten:</strong> ${recipe.ingredients.join(", ")}</p>
+            <p><strong>Zeit:</strong> ${recipe.time} min</p>
+            <p><strong>Level:</strong> ${recipe.level}</p>
         </div>
     `;
-
+  
     recipeCard.appendChild(recipeImage);
     recipeCard.innerHTML += recipeDetails;
-
+  
     recipeCard.addEventListener("click", () => {
         window.location.href = `recipe-details.html?name=${encodeURIComponent(recipe.name)}`;
     });
-
+  
     return recipeCard;
-}
+  }
+  
 
 // Event-Listener für das Formular
 document.getElementById("ingredients-form").addEventListener("submit", searchRecipesHandler);
@@ -294,17 +291,22 @@ function logout() {
         });
 }
 
-// UI aktualisieren
 function updateUI(user) {
     if (user) {
-        document.getElementById("auth-section").style.display = "none";
-        document.getElementById("user-section").style.display = "block";
-        document.getElementById("user-email").textContent = `Angemeldet als: ${user.email}`;
+      document.getElementById("auth-section").style.display = "none";
+      document.getElementById("user-section").style.display = "block";
+      document.getElementById("user-email").textContent = `Angemeldet als: ${user.email}`;
     } else {
-        document.getElementById("auth-section").style.display = "block";
-        document.getElementById("user-section").style.display = "none";
+      document.getElementById("auth-section").style.display = "block";
+      document.getElementById("user-section").style.display = "none";
+      // Direkt Favoriten-Bereich leeren und Hinweis setzen:
+      const favoritesList = document.getElementById("favorite-recipes");
+      if (favoritesList) {
+        favoritesList.innerHTML = "<li style='font-style: italic; color: #999;'>Bitte Einloggen um Favoriten zu sehen</li>";
+      }
     }
-}
+  }
+  
 
 // Überwache Login-Status
 auth.onAuthStateChanged((user) => {
@@ -368,92 +370,142 @@ if (document.getElementById("google-signup-btn")) {
 // in deiner loadRecipeDetails-Funktion gesetzt wird.
 let currentRecipe = null;
 
-/**
- * Funktion, um Favoriten in der linken Sidebar zu laden.
- * Achtung: In deiner recipe-details.html muss ein Element mit der ID "favorite-recipes" vorhanden sein.
- */
-function loadFavorites() {
-  const user = firebase.auth().currentUser;
-  if (!user) return;
-
-  const favoritesList = document.getElementById("favorite-recipes");
-  if (!favoritesList) return; // Falls das Element nicht existiert
-
-  favoritesList.innerHTML = "";
-
-  db.collection("users")
-    .doc(user.uid)
-    .collection("favorites")
-    .orderBy("timestamp", "desc")
-    .get()
-    .then((querySnapshot) => {
+async function loadFavorites() {
+    const favoritesList = document.getElementById("favorite-recipes");
+    if (!favoritesList) return;
+    
+    // Liste zunächst leeren
+    favoritesList.innerHTML = "";
+    
+    // Prüfe, ob ein Nutzer eingeloggt ist
+    const user = firebase.auth().currentUser;
+    if (!user) {
+      const messageItem = document.createElement("li");
+      messageItem.textContent = "Bitte Einloggen um Favoriten zu sehen";
+      messageItem.style.fontStyle = "italic";
+      messageItem.style.color = "#999";
+      favoritesList.appendChild(messageItem);
+      return;
+    }
+  
+    try {
+      const querySnapshot = await db.collection("users")
+        .doc(user.uid)
+        .collection("favorites")
+        .orderBy("timestamp", "desc")
+        .get();
+  
+      if (querySnapshot.empty) {
+        // Kein Favorit vorhanden – zeige entsprechenden Hinweis
+        const messageItem = document.createElement("li");
+        messageItem.textContent = "Füge deine Lieblingsrezepte als Favoriten hinzu um sie hier stehen zu haben.";
+        messageItem.style.fontStyle = "italic";
+        messageItem.style.color = "#999";
+        favoritesList.appendChild(messageItem);
+        return;
+      }
+  
+      // Falls Favoriten vorhanden sind, erstelle die Listeneinträge
       querySnapshot.forEach((doc) => {
         const favorite = doc.data();
+  
         const listItem = document.createElement("li");
-        listItem.innerHTML = `
-          <div class="favorite-item">
-            <span class="favorite-name">${favorite.name}</span>
-            <span class="favorite-level">Level: ${favorite.level || "-"}</span>
-          </div>
-        `;
+        listItem.classList.add("favorite-item");
+  
+        // Thumbnail (falls vorhanden)
+        if (favorite.image) {
+          const thumbnail = document.createElement("img");
+          thumbnail.src = favorite.image;
+          thumbnail.alt = favorite.name;
+          thumbnail.classList.add("favorite-thumbnail");
+          listItem.appendChild(thumbnail);
+        }
+  
+        // Container für Text (Name, Zeit und Level)
+        const infoDiv = document.createElement("div");
+        infoDiv.classList.add("favorite-info");
+  
+        const title = document.createElement("h4");
+        title.textContent = favorite.name;
+        infoDiv.appendChild(title);
+  
+        const details = document.createElement("p");
+        details.textContent = `Zeit: ${favorite.time ? favorite.time + " min" : "unbekannt"} | Level: ${favorite.level || "unbekannt"}`;
+        infoDiv.appendChild(details);
+  
+        listItem.appendChild(infoDiv);
+  
+        // Klick-Event: Navigiere zur Rezeptdetailseite
+        listItem.addEventListener("click", () => {
+          window.location.href = `recipe-details.html?name=${encodeURIComponent(favorite.name)}`;
+        });
+  
         favoritesList.appendChild(listItem);
       });
-    })
-    .catch((error) => {
+    } catch (error) {
       console.error("Fehler beim Laden der Favoriten:", error);
-    });
-}
+    }
+  }
+  
+  
+  
+  
+  // Event: Beim DOMContentLoaded Zutaten laden und Favoriten (falls User eingeloggt)
+  document.addEventListener("DOMContentLoaded", () => {
+    loadAllIngredients(); // Zutaten laden
+    loadFavorites();      // Favoriten laden, falls ein User angemeldet ist
+  });
+  
+  // Überwache Login-Status (Firebase Auth)
+  firebase.auth().onAuthStateChanged((user) => {
+    updateUI(user);
+    if (user) {
+      loadFavorites();
+    }
+  });
 
 /**
  * Funktion, um ein Rezept als Favorit hinzuzufügen oder zu entfernen.
  */
-function toggleFavorite() {
-  const user = firebase.auth().currentUser;
-  if (!user) {
-    alert("Bitte loggen Sie sich ein, um Favoriten zu verwalten.");
-    return;
-  }
+ async function toggleFavorite() {
+    const user = firebase.auth().currentUser;
 
-  const recipeName = document.getElementById("recipe-name").textContent;
-
-  const favoriteRef = db
-    .collection("users")
-    .doc(user.uid)
-    .collection("favorites")
-    .doc(recipeName);
-
-  favoriteRef
-    .get()
-    .then((docSnapshot) => {
+  
+    const recipeName = document.getElementById("recipe-name").textContent;
+    const favoriteRef = db
+      .collection("users")
+      .doc(user.uid)
+      .collection("favorites")
+      .doc(recipeName);
+  
+    try {
+      const docSnapshot = await favoriteRef.get();
+  
       if (docSnapshot.exists) {
-        // Favorit entfernen
-        return favoriteRef.delete().then(() => {
-          alert(`${recipeName} wurde aus deinen Favoriten entfernt.`);
-          updateFavoriteButton(false);
-        });
+        // Rezept ist bereits favorisiert – entferne es
+        await favoriteRef.delete();
+        updateFavoriteButton(false);
       } else {
-        // Favorit hinzufügen – currentRecipe muss vorher in loadRecipeDetails gesetzt worden sein!
+        // Rezept hinzufügen (zusätzlich kannst du weitere Felder speichern, z.B. Level)
         const recipeImage = document.getElementById("recipe-image").src;
-        return favoriteRef.set({
-          name: recipeName,
-          image: recipeImage,
-          level: currentRecipe.level, // Speichere das Level mit
-          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-        }).then(() => {
-          alert(`${recipeName} wurde zu deinen Favoriten hinzugefügt.`);
-          updateFavoriteButton(true);
+        await favoriteRef.set({
+            name: recipeName,
+            image: recipeImage,
+            level: currentRecipe ? currentRecipe.level : "",
+            time: currentRecipe ? currentRecipe.time : "",
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
         });
+        updateFavoriteButton(true);
       }
-    })
-    .then(() => {
-      // Nach erfolgreicher Änderung: Favoritenliste neu laden
+      // Favoritenliste in der linken Sidebar neu laden
       loadFavorites();
-    })
-    .catch((error) => {
+    } catch (error) {
       console.error("Fehler beim Verwalten der Favoriten:", error);
       alert("Fehler beim Verwalten der Favoriten: " + error.message);
-    });
-}
+    }
+  }
+  const recipeName = getRecipeNameFromURL();
+loadRecipeDetails(recipeName);
 
 /**
  * Beispielhafte Funktion, um den Button-Status zu aktualisieren.
@@ -483,18 +535,6 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
   });
 
 
-// Funktion zum Aktualisieren der Benutzeroberfläche
-function updateUI(user) {
-    if (user) {
-        document.getElementById("auth-section").style.display = "none";
-        document.getElementById("user-section").style.display = "block";
-        document.getElementById("user-email").textContent = `Angemeldet als: ${user.email}`;
-    } else {
-        document.getElementById("auth-section").style.display = "block";
-        document.getElementById("user-section").style.display = "none";
-    }
-}
-
 // Beim Laden der Seite den Login-Status überprüfen
 document.addEventListener("DOMContentLoaded", () => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -504,4 +544,53 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
         updateUI(null);
     }
+});
+
+window.loadFavorites = async function () {
+    const user = firebase.auth().currentUser;
+    if (!user) return;
+
+    const favoritesList = document.getElementById("favorite-recipes");
+    if (!favoritesList) return;
+
+    favoritesList.innerHTML = ""; // Liste leeren
+
+    try {
+        const querySnapshot = await db.collection("users")
+            .doc(user.uid)
+            .collection("favorites")
+            .orderBy("timestamp", "desc")
+            .get();
+
+        querySnapshot.forEach((doc) => {
+            const favorite = doc.data();
+            const listItem = document.createElement("li");
+            listItem.textContent = favorite.name;
+            favoritesList.appendChild(listItem);
+        });
+
+    } catch (error) {
+        console.error("Fehler beim Laden der Favoriten:", error);
+    }
+};
+
+  
+
+document.addEventListener("DOMContentLoaded", () => {
+    // Event-Listener für den Toggle-Button
+    const toggleButton = document.getElementById("toggle-more-ingredients");
+    const ingredientContainer = document.getElementById("ingredient-buttons");
+    
+    toggleButton.addEventListener("click", () => {
+        ingredientContainer.classList.toggle("expanded");
+        if (ingredientContainer.classList.contains("expanded")) {
+            toggleButton.textContent = "Zutaten einklappen";
+        } else {
+            toggleButton.textContent = "Weitere Zutaten ausklappen";
+        }
+    });
+    
+    // Zutaten und Favoriten laden
+    loadAllIngredients();
+    loadFavorites();
 });

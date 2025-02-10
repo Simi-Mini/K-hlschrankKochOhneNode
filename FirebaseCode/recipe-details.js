@@ -103,36 +103,11 @@ function updateFavoriteButton(isFavorite) {
 }
 
 // Favoritenstatus prüfen
-// Favoritenstatus prüfen
 async function checkIfFavorite() {
     const user = firebase.auth().currentUser;
     if (!user) return;
-
-    const recipeName = document.getElementById("recipe-name").textContent;
-
-    try {
-        const favoriteRef = db
-            .collection("users")
-            .doc(user.uid)
-            .collection("favorites")
-            .doc(recipeName);
-
-        const doc = await favoriteRef.get();
-        updateFavoriteButton(doc.exists);
-    } catch (error) {
-        console.error("Fehler beim Überprüfen der Favoriten:", error);
-    }
-}
-
-async function toggleFavorite() {
-    const user = firebase.auth().currentUser;
-    if (!user) {
-      alert("Bitte loggen Sie sich ein, um Favoriten zu verwalten.");
-      return;
-    }
   
     const recipeName = document.getElementById("recipe-name").textContent;
-  
     try {
       const favoriteRef = db
         .collection("users")
@@ -141,24 +116,61 @@ async function toggleFavorite() {
         .doc(recipeName);
   
       const docSnapshot = await favoriteRef.get();
+      updateFavoriteButton(docSnapshot.exists);
+    } catch (error) {
+      console.error("Fehler beim Überprüfen der Favoriten:", error);
+    }
+  }
+  
+  // Favoriten-Button aktualisieren
+  function updateFavoriteButton(isFavorite) {
+    const favoriteButton = document.getElementById("favorite-button");
+    if (isFavorite) {
+      favoriteButton.textContent = "Aus Favoriten entfernen";
+      favoriteButton.style.backgroundColor = "#e53935";
+    } else {
+      favoriteButton.textContent = "Zu Favoriten hinzufügen";
+      favoriteButton.style.backgroundColor = "#ff9800";
+    }
+  }
+  
+
+  async function toggleFavorite() {
+    const user = firebase.auth().currentUser;
+    if (!user) {
+      alert("Bitte loggen Sie sich ein, um Favoriten zu verwalten.");
+      return;
+    }
+  
+    const recipeName = document.getElementById("recipe-name").textContent;
+    const favoriteRef = db
+      .collection("users")
+      .doc(user.uid)
+      .collection("favorites")
+      .doc(recipeName);
+  
+    try {
+      const docSnapshot = await favoriteRef.get();
   
       if (docSnapshot.exists) {
+        // Rezept ist bereits favorisiert – entferne es
         await favoriteRef.delete();
         alert(`${recipeName} wurde aus deinen Favoriten entfernt.`);
         updateFavoriteButton(false);
       } else {
+        // Rezept hinzufügen (zusätzlich kannst du weitere Felder speichern, z.B. Level)
         const recipeImage = document.getElementById("recipe-image").src;
-        // Voraussetzung: currentRecipe wird in loadRecipeDetails gesetzt.
         await favoriteRef.set({
-          name: recipeName,
-          image: recipeImage,
-          level: currentRecipe.level, // Level wird hier mitgespeichert
-          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            name: recipeName,
+            image: recipeImage,
+            level: currentRecipe ? currentRecipe.level : "",
+            time: currentRecipe ? currentRecipe.time : "",
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
         });
         alert(`${recipeName} wurde zu deinen Favoriten hinzugefügt.`);
         updateFavoriteButton(true);
       }
-      // Nach dem Ändern der Favoriten wird die Favoritenliste aktualisiert:
+      // Favoritenliste in der linken Sidebar neu laden
       loadFavorites();
     } catch (error) {
       console.error("Fehler beim Verwalten der Favoriten:", error);
@@ -166,12 +178,8 @@ async function toggleFavorite() {
     }
   }
   
-
-  
-
-
-// Event-Listener für Favoriten-Button
-document.getElementById("favorite-button").addEventListener("click", toggleFavorite);
+  // Event-Listener für den Favoriten-Button
+  document.getElementById("favorite-button").addEventListener("click", toggleFavorite);
 
 // Rezept laden, wenn die Seite geöffnet wird
 const recipeName = getRecipeNameFromURL();
@@ -198,7 +206,7 @@ firebase.auth().onAuthStateChanged((user) => {
     }
 });
 
-// Funktion zum Aktualisieren der Benutzeroberfläche
+
 function updateUI(user) {
     const userInfo = document.getElementById("user-info");
     const userStatus = document.getElementById("user-status");
@@ -206,7 +214,7 @@ function updateUI(user) {
 
     if (user) {
         userInfo.style.display = "block";
-        userStatus.textContent = `Eingeloggt als: ${user.email}`;
+        userStatus.textContent = `Angemeldet als: ${user.email}`;
         logoutButton.style.display = "block";
     } else {
         userInfo.style.display = "none";
@@ -234,3 +242,87 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+
+async function loadFavorites() {
+    const favoritesList = document.getElementById("favorite-recipes");
+    if (!favoritesList) return;
+    
+    // Liste zunächst leeren
+    favoritesList.innerHTML = "";
+    
+    // Prüfe, ob ein Nutzer eingeloggt ist
+    const user = firebase.auth().currentUser;
+    if (!user) {
+      const messageItem = document.createElement("li");
+      messageItem.textContent = "Bitte Einloggen um Favoriten zu sehen";
+      messageItem.style.fontStyle = "italic";
+      messageItem.style.color = "#999";
+      favoritesList.appendChild(messageItem);
+      return;
+    }
+  
+    try {
+      const querySnapshot = await db.collection("users")
+        .doc(user.uid)
+        .collection("favorites")
+        .orderBy("timestamp", "desc")
+        .get();
+  
+      if (querySnapshot.empty) {
+        // Kein Favorit vorhanden – zeige entsprechenden Hinweis
+        const messageItem = document.createElement("li");
+        messageItem.textContent = "Füge deine Lieblingsrezepte als Favoriten hinzu um sie hier stehen zu haben.";
+        messageItem.style.fontStyle = "italic";
+        messageItem.style.color = "#999";
+        favoritesList.appendChild(messageItem);
+        return;
+      }
+  
+      // Falls Favoriten vorhanden sind, erstelle die Listeneinträge
+      querySnapshot.forEach((doc) => {
+        const favorite = doc.data();
+  
+        const listItem = document.createElement("li");
+        listItem.classList.add("favorite-item");
+  
+        // Thumbnail (falls vorhanden)
+        if (favorite.image) {
+          const thumbnail = document.createElement("img");
+          thumbnail.src = favorite.image;
+          thumbnail.alt = favorite.name;
+          thumbnail.classList.add("favorite-thumbnail");
+          listItem.appendChild(thumbnail);
+        }
+  
+        // Container für Text (Name, Zeit und Level)
+        const infoDiv = document.createElement("div");
+        infoDiv.classList.add("favorite-info");
+  
+        const title = document.createElement("h4");
+        title.textContent = favorite.name;
+        infoDiv.appendChild(title);
+  
+        const details = document.createElement("p");
+        details.textContent = `Zeit: ${favorite.time ? favorite.time + " min" : "unbekannt"} | Level: ${favorite.level || "unbekannt"}`;
+        infoDiv.appendChild(details);
+  
+        listItem.appendChild(infoDiv);
+  
+        // Klick-Event: Navigiere zur Rezeptdetailseite
+        listItem.addEventListener("click", () => {
+          window.location.href = `recipe-details.html?name=${encodeURIComponent(favorite.name)}`;
+        });
+  
+        favoritesList.appendChild(listItem);
+      });
+    } catch (error) {
+      console.error("Fehler beim Laden der Favoriten:", error);
+    }
+  }
+  
+  
+  
+  document.addEventListener("DOMContentLoaded", () => {
+    loadFavorites();
+  });
+  
