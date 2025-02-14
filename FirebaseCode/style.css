@@ -14,13 +14,18 @@
      line-height: 1.6;
    }
    
-
+.Logo {
+  width: 60%;
+  padding: 0px;
+  margin: 0px;
+}
    .container {
      display: grid;
      grid-template-columns: 1fr 3fr 1fr;
      gap: 20px;
      padding: 20px;
      height: 100vh;
+
    }
    
    /* -------------------------------------------------------------
@@ -64,6 +69,7 @@
      padding: 20px;
      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
      overflow-y: auto;
+     
    }
    
    /* -------------------------------------------------------------
@@ -632,5 +638,44 @@ body {
 
 /* Wenn die Klasse "expanded" hinzugefügt wird, wird die maximale Höhe aufgehoben */
 .ingredient-buttons-container.expanded {
-  max-height: none;
+  max-height: 1000px;
+}
+
+
+.add-recipe {
+  background-color: #ffffff;
+  padding: 20px;
+  margin: 20px 0;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.add-recipe h2 {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.add-recipe input,
+.add-recipe textarea {
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.add-recipe button {
+  display: block;
+  width: 100%;
+  background-color: #007BFF;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.add-recipe button:hover {
+  background-color: #0056b3;
 }

@@ -9,47 +9,78 @@
   <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
   <script defer src="script.js"></script>
   <link rel="stylesheet" href="style.css">
+  
 </head>
 <body>
   <div class="container">
     <!-- Linke Seitenleiste -->
     <div class="left-sidebar">
-        <h3>Favoriten</h3>
-        <div id="favourites-list">
-          <h3>Deine Favoriten</h3>
-          <ul id="favorite-recipes"></ul>
-        </div>
+      <img class="Logo" src="Designer.png" alt="">
+      <div id="favourites-list">
+        <h3>Deine Favoriten</h3>
+        <ul id="favorite-recipes"></ul>
       </div>
-  
+      
+    
+    
+    </div>
+    
     <!-- Hauptinhalt -->
     <main class="main-content">
-      <!-- Überschrift / Logo-Bereich -->
+      
+      <!-- Überschrift / Logo-Bereich mit Sprachumschalt-Button -->
       <div class="überschrift">
-        <h1>Kühlschrank Koch</h1>
-      </div>
+        <h1 id="app-title">Kühlschrank Koch</h1>
 
+
+
+      </div>
+  
       <!-- Zutaten-Auswahl -->
       <section class="zutaten">
         <h2>Wähle deine Zutaten:</h2>
-
         <!-- Dynamische Buttons für Zutaten -->
         <div id="ingredient-buttons" class="ingredient-buttons-container"></div>
-
         <!-- Button zum Ein-/Ausklappen weiterer Zutaten -->
         <button id="toggle-more-ingredients" style="display: none;">Weitere Zutaten ausklappen</button>
-
         <!-- Formular zum Absenden der ausgewählten Zutaten -->
         <form id="ingredients-form">
           <button type="submit">Rezepte suchen</button>
         </form>
       </section>
-
+  
       <!-- Bereich für die angezeigten Rezepte -->
       <section id="recipes-section">
         <div id="recipes"></div>
       </section>
+      <section class="add-recipe">
+        <h2>Eigenes Rezept hinzufügen</h2>
+        <form id="add-recipe-form">
+            <label for="recipe-name-input">Rezeptname:</label>
+            <input type="text" id="recipe-name-input" required>
+    
+            <label>Zutaten und Mengen:</label>
+            <div id="ingredient-list"></div>
+            <button type="button" onclick="addIngredientField()">Zutat hinzufügen</button>
+    
+            <label for="recipe-description-input">Beschreibung:</label>
+            <textarea id="recipe-description-input" required></textarea>
+    
+            <label for="recipe-time-input">Zubereitungszeit (Minuten):</label>
+            <input type="number" id="recipe-time-input" required>
+    
+            <label for="recipe-level-input">Schwierigkeitsgrad:</label>
+            <input type="text" id="recipe-level-input" required>
+    
+            <label for="recipe-image-url">Bild-URL:</label>
+            <input type="url" id="recipe-image-url">
+    
+    
+            <button type="button" onclick="addRecipe()">Rezept speichern</button>
+        </form>
+    </section>
     </main>
-
+  
     <!-- Rechte Spalte (Account-Bereich, Login/Logout) -->
     <aside class="right-sidebar">
       <div id="auth-section">
@@ -57,10 +88,8 @@
         <form id="auth-form">
           <label for="email-or-username">Email oder Benutzername:</label>
           <input type="text" id="email-or-username" placeholder="E-Mail oder Benutzername" required>
-    
           <label for="password">Password:</label>
           <input type="password" id="password" placeholder="Passwort" required>
-    
           <div class="buttons">
             <button type="button" id="login-btn">Login</button>
             <form id="auth-form">
@@ -69,16 +98,22 @@
           </div>
         </form>
       </div>
-    
+  
       <div id="user-section" style="display: none;">
         <p id="user-email"></p>
         <button id="logout-btn">Logout</button>
       </div>
-    
-      <!-- Neuer Projektinfo-Bereich -->
+  
+      <!-- Projektinfo-Bereich -->
       <div class="project-info">
         <h3>Über das Projekt</h3>
-        <p>Dieses Projekt wurde von Simon Rapp und Gideon Rüscher im Rahmen des Programmierprojekt des 1.Halbjahres in der 4.Klasse im Unterricht von Michael Leeb an der HTL Dornbirn entwickelt.</p>
+        <p>Dieses Projekt wurde von Simon Rapp und Gideon Rüscher im Rahmen des Programmierprojekts des 1. Halbjahres in der 4. Klasse im Unterricht von Michael Leeb an der HTL Dornbirn entwickelt.</p>
         <p>Die Schwierigkeitsgrade der Rezepte reichen von 1 (leicht) bis 5 (Michael Leeb).</p>
+        <p>Hinweis: Standardgewürze wie Salz, Pfeffer usw. werden nicht als Zutaten gelistet.</p>
       </div>
+
+
     </aside>
+  </div>
+</body>
+</html>

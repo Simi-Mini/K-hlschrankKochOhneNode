@@ -16,6 +16,7 @@ const auth = firebase.auth();
 // Liste der ausgewählten Zutaten
 let selectedIngredients = [];
 
+
 // Zutaten aus der Datenbank laden und Buttons generieren
 async function loadAllIngredients() {
     try {
@@ -40,23 +41,109 @@ async function loadAllIngredients() {
     }
 }
 
+document.addEventListener("DOMContentLoaded", () => {
+    loadAllIngredients(); // Zutaten laden
+    loadFavorites(); // Favoriten laden
+
+    const toggleButton = document.getElementById("toggle-more-ingredients");
+    const ingredientContainer = document.getElementById("ingredient-buttons");
+
+    if (toggleButton) {
+        toggleButton.addEventListener("click", () => {
+            ingredientContainer.classList.toggle("expanded");
+            if (ingredientContainer.classList.contains("expanded")) {
+                toggleButton.textContent = "Zutaten einklappen";
+            } else {
+                toggleButton.textContent = "Weitere Zutaten ausklappen";
+            }
+        });
+    }
+});
+
 function renderIngredientButtons(ingredients) {
     const ingredientContainer = document.getElementById("ingredient-buttons");
     const toggleButton = document.getElementById("toggle-more-ingredients");
-    ingredientContainer.innerHTML = ""; // Bestehende Buttons löschen
+    ingredientContainer.innerHTML = ""; // Vorherige Buttons löschen
 
     ingredients.forEach(ingredient => {
         const button = createIngredientButton(ingredient);
         ingredientContainer.appendChild(button);
     });
 
-    // Wenn mehr als 2 Reihen an Zutaten existieren, zeige den Toggle-Button
-    const maxVisibleHeight = 150; // Höhe, bei der die Box abgeschnitten wird
-    if (ingredientContainer.scrollHeight > maxVisibleHeight) {
-        toggleButton.style.display = "block";
-    } else {
-        toggleButton.style.display = "none";
+    // Toggle-Button nur anzeigen, wenn mehr als eine bestimmte Anzahl an Zutaten vorhanden ist
+    setTimeout(() => {
+        if (ingredientContainer.scrollHeight > 150) {
+            toggleButton.style.display = "block";
+        } else {
+            toggleButton.style.display = "none";
+        }
+    }, 100);
+}
+
+// Funktion zum Hinzufügen eines neuen Rezepts
+async function addRecipe() {
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        alert("Bitte logge dich ein, um ein Rezept hinzuzufügen.");
+        return;
     }
+
+    const recipeName = document.getElementById("recipe-name-input").value.trim();
+    const ingredients = document.querySelectorAll(".ingredient-entry");
+    const description = document.getElementById("recipe-description-input").value.trim();
+    const time = document.getElementById("recipe-time-input").value.trim();
+    const level = document.getElementById("recipe-level-input").value.trim();
+    const image = document.getElementById("recipe-image-url").value.trim();
+    const isPublic = document.getElementById("recipe-public").checked;
+
+    if (!recipeName || ingredients.length === 0 || !description || !time || !level) {
+        alert("Bitte fülle alle Felder aus.");
+        return;
+    }
+
+    // Mengenangaben aus dem Formular erfassen
+    let amounts = [];
+    ingredients.forEach(entry => {
+        const ingredientName = entry.querySelector(".ingredient-name").value.trim();
+        const ingredientAmount = entry.querySelector(".ingredient-amount").value.trim();
+        if (ingredientName && ingredientAmount) {
+            amounts.push({ Zutat: ingredientName, Menge: ingredientAmount });
+        }
+    });
+
+    try {
+        await db.collection("recipes").add({
+            name: recipeName,
+            ingredients: amounts.map(a => a.Zutat),
+            amounts: amounts,
+            beschreibung: description,
+            time: time,
+            level: level,
+            image: image || "https://via.placeholder.com/600",
+            public: isPublic,
+            owner: user.uid,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        alert("Rezept erfolgreich hinzugefügt!");
+        document.getElementById("add-recipe-form").reset();
+        document.getElementById("ingredient-list").innerHTML = ""; // Zutatenliste zurücksetzen
+    } catch (error) {
+        console.error("Fehler beim Hinzufügen des Rezepts:", error);
+        alert("Fehler beim Hinzufügen des Rezepts: " + error.message);
+    }
+}
+
+// Funktion zum Hinzufügen eines neuen Zutatenfelds
+function addIngredientField() {
+    const ingredientList = document.getElementById("ingredient-list");
+    const ingredientEntry = document.createElement("div");
+    ingredientEntry.classList.add("ingredient-entry");
+    ingredientEntry.innerHTML = `
+        <input type="text" class="ingredient-name" placeholder="Zutat" required>
+        <input type="text" class="ingredient-amount" placeholder="Menge" required>
+        <button type="button" onclick="this.parentElement.remove()">✖</button>
+    `;
+    ingredientList.appendChild(ingredientEntry);
 }
 
 
@@ -177,31 +264,63 @@ async function searchRecipes(selectedIngredients) {
 function createRecipeCard(recipe, missingIngredients) {
     const recipeCard = document.createElement("div");
     recipeCard.classList.add("recipe-card");
-  
+    
     const recipeImage = document.createElement("img");
     recipeImage.src = recipe.image;
     recipeImage.alt = recipe.name;
     recipeImage.classList.add("recipe-image");
-  
-    // Zeige Name, Zutaten, Zeit und Level an
-    const recipeDetails = `
-        <div class="recipe-content">
-            <h3 class="recipe-title">${recipe.name}</h3>
-            <p><strong>Zutaten:</strong> ${recipe.ingredients.join(", ")}</p>
-            <p><strong>Zeit:</strong> ${recipe.time} min</p>
-            <p><strong>Level:</strong> ${recipe.level}</p>
-        </div>
-    `;
-  
+    recipeImage.style.width = "100%";
+    recipeImage.style.height = "200px";
+    recipeImage.style.objectFit = "cover";
+    
+    const recipeContent = document.createElement("div");
+    recipeContent.classList.add("recipe-content");
+    recipeContent.style.display = "flex";
+    recipeContent.style.flexDirection = "column";
+    recipeContent.style.justifyContent = "space-between";
+    recipeContent.style.height = "100%";
+
+    const recipeTitle = document.createElement("h3");
+    recipeTitle.classList.add("recipe-title");
+    recipeTitle.textContent = recipe.name;
+
+    const recipeDetails = document.createElement("div");
+    recipeDetails.classList.add("recipe-details");
+    
+    const recipeIngredients = document.createElement("p");
+    recipeIngredients.classList.add("recipe-info");
+    recipeIngredients.innerHTML = `<strong>Zutaten:</strong> ${recipe.ingredients.join(", ")}`;
+    recipeIngredients.style.flexGrow = "1";
+    recipeIngredients.style.overflow = "hidden";
+
+    const recipeTime = document.createElement("p");
+    recipeTime.classList.add("recipe-info");
+    recipeTime.innerHTML = `<strong>Zeit:</strong> ${recipe.time} min`;
+    
+    const recipeLevel = document.createElement("p");
+    recipeLevel.classList.add("recipe-info");
+    recipeLevel.innerHTML = `<strong>Level:</strong> ${recipe.level}`;
+    recipeLevel.style.fontWeight = "bold";
+
+    recipeDetails.appendChild(recipeIngredients);
+    recipeDetails.appendChild(recipeTime);
+    recipeDetails.appendChild(recipeLevel);
+
+    recipeContent.appendChild(recipeTitle);
+    recipeContent.appendChild(recipeDetails);
+    
     recipeCard.appendChild(recipeImage);
-    recipeCard.innerHTML += recipeDetails;
-  
+    recipeCard.appendChild(recipeContent);
+    
     recipeCard.addEventListener("click", () => {
         window.location.href = `recipe-details.html?name=${encodeURIComponent(recipe.name)}`;
     });
-  
+    
     return recipeCard;
-  }
+}
+
+
+
   
 
 // Event-Listener für das Formular
@@ -239,7 +358,6 @@ async function login() {
         const userCredential = await auth.signInWithEmailAndPassword(email, password);
         const user = userCredential.user;
 
-        alert(`Login erfolgreich! Willkommen, ${user.email}`);
         updateUI(user);
     } catch (error) {
         console.error("Fehler beim Login:", error);
@@ -283,7 +401,6 @@ async function register() {
 function logout() {
     auth.signOut()
         .then(() => {
-            alert("Erfolgreich ausgeloggt!");
             updateUI(null);
         })
         .catch((error) => {
@@ -351,7 +468,6 @@ async function googleSignup() {
             });
         }
 
-        alert(`Willkommen, ${user.displayName || "Benutzer"}!`);
         updateUI(user);
     } catch (error) {
         console.error("Fehler beim Google-Signup:", error);
@@ -522,9 +638,6 @@ function updateFavoriteButton(isFavorite) {
   }
 }
 
-  
-  
-
 
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
   .then(() => {
@@ -574,23 +687,22 @@ window.loadFavorites = async function () {
     }
 };
 
-  
-
 document.addEventListener("DOMContentLoaded", () => {
-    // Event-Listener für den Toggle-Button
+    // Toggle-Button-Event: Schaltet den ausgeklappten Zustand des Zutaten-Containers um
     const toggleButton = document.getElementById("toggle-more-ingredients");
     const ingredientContainer = document.getElementById("ingredient-buttons");
-    
+  
     toggleButton.addEventListener("click", () => {
-        ingredientContainer.classList.toggle("expanded");
-        if (ingredientContainer.classList.contains("expanded")) {
-            toggleButton.textContent = "Zutaten einklappen";
-        } else {
-            toggleButton.textContent = "Weitere Zutaten ausklappen";
-        }
+      ingredientContainer.classList.toggle("expanded");
+      if (ingredientContainer.classList.contains("expanded")) {
+        toggleButton.textContent = "Zutaten einklappen";
+      } else {
+        toggleButton.textContent = "Weitere Zutaten ausklappen";
+      }
     });
-    
+  
     // Zutaten und Favoriten laden
     loadAllIngredients();
     loadFavorites();
-});
+  });
+  
