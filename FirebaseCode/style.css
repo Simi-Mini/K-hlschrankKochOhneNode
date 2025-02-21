@@ -435,7 +435,7 @@
      display: block;
      margin: 10px auto;
      padding: 10px 15px;
-     background-color: #FFC107; /* Gelber Akzent */
+     background-color: #007BFF; /* Gelber Akzent */
      color: #FFF;
      border: none;
      border-radius: 6px;
@@ -445,7 +445,7 @@
      transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
    }
    #favorite-button:hover {
-     background-color: #E0A800;
+     background-color: #007BFF;
      transform: translateY(-2px);
      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
    }
@@ -679,3 +679,179 @@ body {
 .add-recipe button:hover {
   background-color: #0056b3;
 }
+
+
+/* Importierte Schriftart */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+  color: #2c2c2c;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 280px auto 280px;
+  gap: 20px;
+  padding: 40px;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 0;
+  box-shadow: none;
+  backdrop-filter: blur(10px);
+}
+
+.left-sidebar, .right-sidebar {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 25px;
+  border-radius: 0;
+  box-shadow: none;
+  text-align: center;
+  height: 100vh;
+}
+
+.main-content {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 30px;
+  border-radius: 0;
+  box-shadow: none;
+  overflow-y: auto;
+  height: 100vh;
+}
+
+h1, h2, h3 {
+  color: #007BFF;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 15px;
+}
+
+button {
+  background: #007BFF;
+  color: white;
+  border: none;
+  padding: 14px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s;
+}
+
+button:hover {
+  background: #cc4626;
+  transform: scale(1.05);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* Rezeptkarten */
+.recipe-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  width: 100%;
+}
+
+.recipe-card {
+  background: white;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+}
+
+.recipe-card:hover {
+  transform: scale(1.07);
+}
+
+.recipe-image-container {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.recipe-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.recipe-content {
+  text-align: center;
+  padding: 15px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.recipe-content::after {
+  content: '';
+  display: block;
+  width: 50px;
+  height: 3px;
+  background: #ff5733;
+  margin: 10px auto;
+}
+
+/* Favoritenbereich */
+.favorite-item {
+  display: flex;
+  align-items: center;
+  background: #fdf1e3;
+  padding: 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: transform 0.3s;
+}
+
+.favorite-item:hover {
+  background: #fbe0c3;
+  transform: scale(1.05);
+}
+
+.favorite-thumbnail {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-right: 12px;
+}
+
+/* Mobile Anpassungen */
+@media (max-width: 900px) {
+  .container {
+    grid-template-columns: 1fr;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+  }
+
+  .left-sidebar, .right-sidebar {
+    display: none;
+  }
+}
+
