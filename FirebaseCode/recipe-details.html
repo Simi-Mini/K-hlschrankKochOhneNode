@@ -1,61 +1,74 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rezept-Details</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
-    <script defer src="recipe-details.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rezept-Details</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+  <script defer src="recipe-details.js"></script>
 </head>
 <body>
-    <div class="container">
-<!-- Linke Seitenleiste -->
-<div class="left-sidebar">
-  <img class="Logo" src="Designer.png" alt="">
-  <div id="favourites-list">
-      <h3>Deine Favoriten</h3>
-      <ul id="favorite-recipes"></ul>
-    </div>
-  </div>
-  
+  <div class="container">
+    
+    <aside class="left-sidebar">
+      <img class="Logo" src="Designer.png" alt="Logo">
+      <div id="favourites-list">
+        <h3>Deine Favoriten</h3>
+        <ul id="favorite-recipes"></ul>
+      </div>
+    </aside>
 
-        <!-- Hauptinhalt -->
-        <div class="main-content">
-            <button id="back-to-home" class="back-button">Zurück zur Startseite</button>
+    <main class="main-content">
 
-            <div id="recipe-details">
-                <h1 id="recipe-name"></h1>
-                <img id="recipe-image" src="" alt="Rezept Bild" class="recipe-image">
-                <button id="favorite-button">Favorit</button> <!-- Neuer Button -->
-                <h3>Zutaten</h3>
-                <table id="recipe-amounts" class="amounts-table"></table>
-                <p id="recipe-level"></p>
-                <p id="recipe-time"></p>
-                <h3>Zubereitung</h3>
-                <p id="recipe-description"></p>
-            </div>
-            
+      <div class="hero-section">
+        <img id="recipe-image" src="" alt="Rezept Bild" class="hero-image">
+        <div class="hero-overlay">
+          <button id="back-to-home" class="back-button">←</button>
+          <h1 id="recipe-name" class="hero-title">Rezepttitel</h1>
+          <button id="favorite-button" class="favorite-btn">Zu Favoriten hinzufügen</button>
         </div>
+      </div>
 
-        <!-- Rechte Seitenleiste -->
-        <!-- Rechte Seitenleiste -->
-<div class="right-sidebar">
-    <div id="user-info">
-      <p id="user-status">Nicht eingeloggt</p>
-      <button id="logout-button" style="display: none;">Logout</button>
+      <div class="recipe-meta">
+        <span id="recipe-time" class="meta-item">Zeit: 25 Minuten</span>
+        <span id="recipe-level" class="meta-item">Level: 2</span>
+      </div>
+
+      <section class="zutaten-section">
+        <h2>Zutaten &amp; Mengen</h2>
+        <table id="recipe-amounts" class="amounts-table"></table>
+      </section>
+
+      <section class="zubereitung-section">
+        <h2>Zubereitung</h2>
+        <p id="recipe-description"></p>
+      </section>
+
+    </main>
+
+    <aside class="right-sidebar">
+      <div id="user-info">
+        <p id="user-status">Nicht eingeloggt</p>
+        <div class="logoutbtn">
+        <button id="logout-button" style="display: none;">Logout</button>
+      </div>
     </div>
-    
-    <!-- Neuer Projektinfo-Bereich -->
-    <div class="project-info">
-      <h3>Über das Projekt</h3>
-      <p>Dieses Projekt wurde von Simon Rapp und Gideon Rüscher im Rahmen des Programmierprojekt des 1.Halbjahres in der 4.Klasse im Unterricht von Michael Leeb an der HTL Dornbirn entwickelt..</p>
-      <p>Die Schwierigkeitsgrade der Rezepte reichen von 1 (leicht) bis 5 (Michael Leeb).</p>
-    </div>
-    
+      <div class="project-info">
+        <h3>Über das Projekt</h3>
+        <p>Dieses Projekt wurde von Simon Rapp und Gideon Rüscher im Rahmen des Programmierprojekts des 1. Halbjahres in der 4. Klasse im Unterricht von Michael Leeb an der HTL Dornbirn entwickelt.</p>
+        <p>Die Schwierigkeitsgrade der Rezepte reichen von 1 (leicht) bis 5 (Michael Leeb).</p>
+      </div>
+    </aside>
+
   </div>
-  
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <span class="close-button" onclick="closeModal()">&times;</span>
+      <p id="modal-message"></p>
+    </div>
+  </div>
 </body>
 </html>

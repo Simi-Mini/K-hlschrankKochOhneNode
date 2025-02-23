@@ -17,7 +17,6 @@ const auth = firebase.auth();
 let selectedIngredients = [];
 
 
-// Zutaten aus der Datenbank laden und Buttons generieren
 async function loadAllIngredients() {
     try {
         const recipesRef = db.collection("recipes");
@@ -25,7 +24,6 @@ async function loadAllIngredients() {
 
         const uniqueIngredients = new Set();
 
-        // Zutaten aus den Rezepten sammeln
         querySnapshot.forEach(doc => {
             const recipe = doc.data();
             if (recipe.ingredients && Array.isArray(recipe.ingredients)) {
@@ -84,7 +82,7 @@ function renderIngredientButtons(ingredients) {
 async function addRecipe() {
     const user = firebase.auth().currentUser;
     if (!user) {
-        alert("Bitte logge dich ein, um ein Rezept hinzuzufügen.");
+        showModal("Bitte logge dich ein, um ein Rezept hinzuzufügen.");
         return;
     }
 
@@ -97,11 +95,9 @@ async function addRecipe() {
     const isPublic = document.getElementById("recipe-public").checked;
 
     if (!recipeName || ingredients.length === 0 || !description || !time || !level) {
-        alert("Bitte fülle alle Felder aus.");
+        showModal("Bitte fülle alle Felder aus.");
         return;
     }
-
-    // Mengenangaben aus dem Formular erfassen
     let amounts = [];
     ingredients.forEach(entry => {
         const ingredientName = entry.querySelector(".ingredient-name").value.trim();
@@ -124,12 +120,12 @@ async function addRecipe() {
             owner: user.uid,
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
-        alert("Rezept erfolgreich hinzugefügt!");
+        showModal("Rezept erfolgreich hinzugefügt!");
         document.getElementById("add-recipe-form").reset();
         document.getElementById("ingredient-list").innerHTML = ""; // Zutatenliste zurücksetzen
     } catch (error) {
         console.error("Fehler beim Hinzufügen des Rezepts:", error);
-        alert("Fehler beim Hinzufügen des Rezepts: " + error.message);
+        showModal("Fehler beim Hinzufügen des Rezepts: " + error.message);
     }
 }
 
@@ -157,7 +153,6 @@ function createIngredientButton(ingredient) {
     return button;
 }
 
-// Zutaten-Auswahl toggeln
 function toggleIngredientSelection(button) {
     const ingredient = button.dataset.value;
 
@@ -171,28 +166,26 @@ function toggleIngredientSelection(button) {
         button.classList.add("active");
     }
 
-    console.log("Ausgewählte Zutaten:", selectedIngredients); // Debugging
+    console.log("Ausgewählte Zutaten:", selectedIngredients); 
 }
 
-// Suche nach Rezepten starten, wenn der Button geklickt wird
 async function searchRecipesHandler(event) {
-    event.preventDefault(); // Verhindert Seiten-Neuladen
+    event.preventDefault(); 
     if (selectedIngredients.length === 0) {
         alert("Bitte wähle mindestens eine Zutat aus!");
         return;
     }
-    console.log("Starte Rezeptsuche mit Zutaten:", selectedIngredients); // Debugging
-    searchRecipes(selectedIngredients); // Rezepte basierend auf ausgewählten Zutaten suchen
+    console.log("Starte Rezeptsuche mit Zutaten:", selectedIngredients); 
+    searchRecipes(selectedIngredients); 
 }
 
-// Rezepte basierend auf ausgewählten Zutaten suchen
 async function searchRecipes(selectedIngredients) {
     try {
         const recipesRef = db.collection("recipes");
         const querySnapshot = await recipesRef.get();
 
         const recipesDiv = document.getElementById("recipes");
-        recipesDiv.innerHTML = ""; // Alte Ergebnisse löschen
+        recipesDiv.innerHTML = ""; 
 
         const completeRecipes = [];
         const incompleteRecipes = [];
@@ -200,7 +193,6 @@ async function searchRecipes(selectedIngredients) {
         querySnapshot.forEach(doc => {
             const recipe = doc.data();
             const recipeIngredients = recipe.ingredients;
-
             const missingIngredients = recipeIngredients.filter(
                 ingredient => !selectedIngredients.includes(ingredient)
             );
@@ -320,16 +312,12 @@ function createRecipeCard(recipe, missingIngredients) {
 }
 
 
-
-  
-
-// Event-Listener für das Formular
 document.getElementById("ingredients-form").addEventListener("submit", searchRecipesHandler);
 
 // Event-Listener für das Laden der Zutaten
 document.addEventListener("DOMContentLoaded", () => {
-    loadAllIngredients(); // Lade alle Zutaten beim Start
-    loadFavorites(); // Lade Favoriten beim Start
+    loadAllIngredients(); 
+    loadFavorites(); 
 });
 
 // Login-Funktion
@@ -425,7 +413,6 @@ function updateUI(user) {
   }
   
 
-// Überwache Login-Status
 auth.onAuthStateChanged((user) => {
     if (user) {
         updateUI(user);
@@ -493,7 +480,7 @@ async function loadFavorites() {
     // Liste zunächst leeren
     favoritesList.innerHTML = "";
     
-    // Prüfe, ob ein Nutzer eingeloggt ist
+
     const user = firebase.auth().currentUser;
     if (!user) {
       const messageItem = document.createElement("li");
@@ -524,7 +511,6 @@ async function loadFavorites() {
       // Falls Favoriten vorhanden sind, erstelle die Listeneinträge
       querySnapshot.forEach((doc) => {
         const favorite = doc.data();
-  
         const listItem = document.createElement("li");
         listItem.classList.add("favorite-item");
   
@@ -706,3 +692,15 @@ document.addEventListener("DOMContentLoaded", () => {
     loadFavorites();
   });
   
+
+  function showModal(message) {
+    const modal = document.getElementById("modal");
+    const modalMessage = document.getElementById("modal-message");
+    modalMessage.textContent = message;
+    modal.style.display = "block";
+  }
+  
+  function closeModal() {
+    const modal = document.getElementById("modal");
+    modal.style.display = "none";
+  }

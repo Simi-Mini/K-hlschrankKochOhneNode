@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8">
@@ -9,47 +8,31 @@
   <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
   <script defer src="script.js"></script>
   <link rel="stylesheet" href="style.css">
-  
 </head>
 <body>
   <div class="container">
-    <!-- Linke Seitenleiste -->
     <div class="left-sidebar">
       <img class="Logo" src="Designer.png" alt="">
       <div id="favourites-list">
         <h3>Deine Favoriten</h3>
         <ul id="favorite-recipes"></ul>
       </div>
-      
-    
-    
     </div>
     
-    <!-- Hauptinhalt -->
     <main class="main-content">
-      
-      <!-- Überschrift / Logo-Bereich mit Sprachumschalt-Button -->
       <div class="überschrift">
-        <h1 id="app-title">Kühlschrank Koch</h1>
-
-
-
+        <img id="Schriftzug" src="Schriftzug.PNG" alt="">
       </div>
   
-      <!-- Zutaten-Auswahl -->
       <section class="zutaten">
         <h2>Wähle deine Zutaten:</h2>
-        <!-- Dynamische Buttons für Zutaten -->
         <div id="ingredient-buttons" class="ingredient-buttons-container"></div>
-        <!-- Button zum Ein-/Ausklappen weiterer Zutaten -->
         <button id="toggle-more-ingredients" style="display: none;">Weitere Zutaten ausklappen</button>
-        <!-- Formular zum Absenden der ausgewählten Zutaten -->
         <form id="ingredients-form">
           <button type="submit">Rezepte suchen</button>
         </form>
       </section>
   
-      <!-- Bereich für die angezeigten Rezepte -->
       <section id="recipes-section">
         <div id="recipes"></div>
       </section>
@@ -75,25 +58,17 @@
             <label for="recipe-image-url">Bild-URL:</label>
             <input type="url" id="recipe-image-url">
     
-    
             <button type="button" onclick="addRecipe()">Rezept speichern</button>
         </form>
-    </section>
+      </section>
     </main>
-  
-    <!-- Rechte Spalte (Account-Bereich, Login/Logout) -->
+
     <aside class="right-sidebar">
       <div id="auth-section">
         <h2>Account</h2>
-        <form id="auth-form">
-          <label for="email-or-username">Email oder Benutzername:</label>
-          <input type="text" id="email-or-username" placeholder="E-Mail oder Benutzername" required>
-          <label for="password">Password:</label>
-          <input type="password" id="password" placeholder="Passwort" required>
           <div class="buttons">
-            <button type="button" id="login-btn">Login</button>
             <form id="auth-form">
-              <button id="google-signup-btn" type="button">Mit Google registrieren</button>
+              <button id="google-signup-btn" type="button">Mit Google Einloggen</button>
             </form>
           </div>
         </form>
@@ -104,16 +79,19 @@
         <button id="logout-btn">Logout</button>
       </div>
   
-      <!-- Projektinfo-Bereich -->
       <div class="project-info">
         <h3>Über das Projekt</h3>
         <p>Dieses Projekt wurde von Simon Rapp und Gideon Rüscher im Rahmen des Programmierprojekts des 1. Halbjahres in der 4. Klasse im Unterricht von Michael Leeb an der HTL Dornbirn entwickelt.</p>
         <p>Die Schwierigkeitsgrade der Rezepte reichen von 1 (leicht) bis 5 (Michael Leeb).</p>
         <p>Hinweis: Standardgewürze wie Salz, Pfeffer usw. werden nicht als Zutaten gelistet.</p>
       </div>
-
-
     </aside>
+  </div>
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <span class="close-button" onclick="closeModal()">&times;</span>
+      <p id="modal-message"></p>
+    </div>
   </div>
 </body>
 </html>
